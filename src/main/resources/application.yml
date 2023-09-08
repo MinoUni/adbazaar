@@ -1,0 +1,31 @@
+# LOGGING
+logging:
+  level:
+    root: INFO
+# SPRING
+spring:
+  jpa:
+    database: h2
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format-sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+  datasource:
+    #H2 Database
+    url: jdbc:h2:mem:addbazar
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+# APPLICATION
+application:
+  # JWT
+  security:
+    jwt:
+      access:
+        secret-key: 423d042d0b4ec570d1b69913279b29804cb0740fa9bb5be179f4b54f3260ac73
+        expiration-minutes: 15
+      refresh:
+        secret-key: 0de6ef60ddba297678c3ab3da92fdfd28f356a4c5846021af749ab7cbbdc187a
+        expiration-days: 7
