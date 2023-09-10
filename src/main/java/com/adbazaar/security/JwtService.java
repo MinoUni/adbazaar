@@ -17,39 +17,39 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private final String ACCESS_SECRET_KEY;
-    private final Integer ACCESS_EXPIRATION_MINUTES;
-    private final String REFRESH_SECRET_KEY;
-    private final Integer REFRESH_EXPIRATION_DAYS;
+    private final String accessSecretKey;
+    private final Integer accessExpirationMinutes;
+    private final String refreshSecretKey;
+    private final Integer refreshExpirationDays;
 
-    public JwtService(@Value("${application.security.jwt.access.secret-key}") String ACCESS_SECRET_KEY,
-                      @Value("${application.security.jwt.access.expiration-minutes}") Integer ACCESS_EXPIRATION_MINUTES,
-                      @Value("${application.security.jwt.refresh.secret-key}") String REFRESH_SECRET_KEY,
-                      @Value("${application.security.jwt.refresh.expiration-days}") Integer REFRESH_EXPIRATION_DAYS) {
-        this.ACCESS_SECRET_KEY = ACCESS_SECRET_KEY;
-        this.ACCESS_EXPIRATION_MINUTES = ACCESS_EXPIRATION_MINUTES;
-        this.REFRESH_SECRET_KEY = REFRESH_SECRET_KEY;
-        this.REFRESH_EXPIRATION_DAYS = REFRESH_EXPIRATION_DAYS;
+    public JwtService(@Value("${application.security.jwt.access.secret-key}") String accessSecretKey,
+                      @Value("${application.security.jwt.access.expiration-minutes}") Integer accessExpirationMinutes,
+                      @Value("${application.security.jwt.refresh.secret-key}") String refreshSecretKey,
+                      @Value("${application.security.jwt.refresh.expiration-days}") Integer refreshExpirationDays) {
+        this.accessSecretKey = accessSecretKey;
+        this.accessExpirationMinutes = accessExpirationMinutes;
+        this.refreshSecretKey = refreshSecretKey;
+        this.refreshExpirationDays = refreshExpirationDays;
     }
 
-    public String generateAccessToken(String email) {
+    public String generateAccessToken(UserDetails userDetails) {
         Calendar calendar = getCalendar();
-        calendar.add(Calendar.MINUTE, ACCESS_EXPIRATION_MINUTES);
+        calendar.add(Calendar.MINUTE, accessExpirationMinutes);
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(calendar.getTime())
-                .signWith(getSignInKey(ACCESS_SECRET_KEY), SignatureAlgorithm.HS256)
+                .signWith(getSignInKey(accessSecretKey), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public boolean isAccessTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsernameFromAccessToken(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token, ACCESS_SECRET_KEY);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token, accessSecretKey);
     }
 
     public String extractUsernameFromAccessToken(String token) {
-        return extractClaim(token, ACCESS_SECRET_KEY, Claims::getSubject);
+        return extractClaim(token, accessSecretKey, Claims::getSubject);
     }
 
     public <T> T extractClaim(String token, String secret, Function<Claims, T> claimsResolver) {

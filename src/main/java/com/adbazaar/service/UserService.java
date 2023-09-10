@@ -48,7 +48,7 @@ public class UserService {
         return LoginResponse.builder()
                 .fullName(user.getFullName())
                 .email(user.getEmail())
-                .accessToken(jwtService.generateAccessToken(user.getEmail()))
+                .accessToken(jwtService.generateAccessToken(user))
                 .build();
     }
 }
