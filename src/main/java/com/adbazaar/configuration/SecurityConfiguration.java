@@ -33,7 +33,19 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(mvc.pattern("/auth/**"), PathRequest.toH2Console()).permitAll()
+                        .requestMatchers(
+                                mvc.pattern("/auth/**"),
+                                mvc.pattern("/v2/api-docs"),
+                                mvc.pattern("/v3/api-docs"),
+                                mvc.pattern("/v3/api-docs/**"),
+                                mvc.pattern("/swagger-resources"),
+                                mvc.pattern("/swagger-resources/**"),
+                                mvc.pattern("/configuration/ui"),
+                                mvc.pattern("/configuration/security"),
+                                mvc.pattern("/swagger-ui/**"),
+                                mvc.pattern("/webjars/**"),
+                                mvc.pattern("/swagger-ui.html"),
+                                PathRequest.toH2Console()).permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
                 .build();
