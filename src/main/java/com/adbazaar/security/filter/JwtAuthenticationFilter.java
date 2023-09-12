@@ -1,5 +1,6 @@
 package com.adbazaar.security.filter;
 
+import com.adbazaar.exception.AccessTokenException;
 import com.adbazaar.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -37,12 +38,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final var username = jwtService.extractUsernameFromAccessToken(jwt);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtService.isAccessTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (!jwtService.isAccessTokenValid(jwt, userDetails)) {
+                throw new AccessTokenException("Provided invalid or expired access token");
             }
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);
     }
