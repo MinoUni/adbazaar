@@ -2,10 +2,7 @@ package com.adbazaar.model;
 
 import com.adbazaar.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,8 +30,13 @@ public class AppUser implements UserDetails {
     @Column(name = "full_name")
     private String fullName;
 
-    @Enumerated()
+    @Enumerated(EnumType.STRING)
     private Role role;
+
+    @ToString.Exclude
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private Token token;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
