@@ -62,6 +62,7 @@ public class UserService {
                 .build();
         user.setVerificationCode(assignVerificationCode(user));
         userRepo.save(user);
+        // TODO: Send email
         return RegistrationResponse.builder()
                 .email(userDetails.getEmail())
                 .build();
@@ -103,12 +104,33 @@ public class UserService {
                 .build();
     }
 
+    public ApiResponse reassignVerificationCode(String email) {
+        var user = findUser(email);
+        if (user.getIsVerified()) {
+            throw new AccountVerificationException("Account already verified");
+        }
+        var verCode = user.getVerificationCode();
+        verCode.setCode(generateCode());
+        verCode.setExpirationDate(LocalDateTime.now().plusHours(1L));
+        verificationCodeRepo.save(verCode);
+        // TODO: Send email
+        return ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("Verification code reassigned")
+                .build();
+    }
+
     private VerificationCode assignVerificationCode(AppUser user) {
         return VerificationCode.builder()
                 .user(user)
-                .code(String.format("%04d", new Random().nextInt(10_000)))
+                .code(generateCode())
                 .expirationDate(LocalDateTime.now().plusHours(1L))
                 .build();
+    }
+
+    private static String generateCode() {
+        return String.format("%04d", new Random().nextInt(10_000));
     }
 
     private AppUser findUser(String email) {

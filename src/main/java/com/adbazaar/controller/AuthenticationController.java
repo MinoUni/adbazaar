@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -44,6 +45,11 @@ public class AuthenticationController {
     @PostMapping("/verification")
     public ResponseEntity<ApiResponse> verifyUserCode(@Valid @RequestBody UserVerification userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.verifyCode(userDetails));
+    }
+
+    @PostMapping("verification/resend")
+    public ResponseEntity<ApiResponse> resendVerifyCode(@Valid @RequestParam String email) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.reassignVerificationCode(email));
     }
 
     @PostMapping("/token/revoke")
