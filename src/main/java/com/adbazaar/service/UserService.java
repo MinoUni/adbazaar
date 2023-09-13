@@ -15,30 +15,26 @@ import com.adbazaar.model.VerificationCode;
 import com.adbazaar.repository.UserRepository;
 import com.adbazaar.repository.VerificationCodeRepository;
 import com.adbazaar.security.JwtService;
-import lombok.RequiredArgsConstructor;
+import com.adbazaar.utils.MailDetails;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Random;
 
-/*
- *  TODO:[OPTIONAL]:Think about replace Roles(String) with Roles(List<Authority>)
- *   1. Refuse access to some functionality if lack of authorities or provide only part of functionality
- *  TODO:Complete verification process, move reset and change password functions, add base user management endpoints
- *   1. Deni access if unverified
- *   2. Send email with code
- *   3. Code validation(!isExpired)
- *   4. Change user status if verification successful
- *   5. Reassign and resend verification code if previous expired
- *
- * */
-@RequiredArgsConstructor
 @Service
 public class UserService {
 
@@ -47,6 +43,24 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final VerificationCodeRepository verificationCodeRepo;
+    private final JavaMailSender javaMailSender;
+    private final String appEmail;
+
+    public UserService(UserRepository userRepo,
+                       VerificationCodeRepository verificationCodeRepo,
+                       JwtService jwtService,
+                       JavaMailSender javaMailSender,
+                       AuthenticationManager authenticationManager,
+                       PasswordEncoder passwordEncoder,
+                       @Value("spring.mail.username") String applicationEmail) {
+        this.userRepo = userRepo;
+        this.verificationCodeRepo = verificationCodeRepo;
+        this.jwtService = jwtService;
+        this.javaMailSender = javaMailSender;
+        this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
+        this.appEmail = applicationEmail;
+    }
 
     public RegistrationResponse register(RegistrationRequest userDetails) {
         if (userRepo.existsByEmail(userDetails.getEmail())) {
@@ -62,7 +76,11 @@ public class UserService {
                 .build();
         user.setVerificationCode(assignVerificationCode(user));
         userRepo.save(user);
-        // TODO: Send email
+        sendEmail(MailDetails.builder()
+                    .user(user)
+                    .subject("Account code activation")
+                    .content(getContentForVerificationCode(user))
+                    .build());
         return RegistrationResponse.builder()
                 .email(userDetails.getEmail())
                 .build();
@@ -113,12 +131,41 @@ public class UserService {
         verCode.setCode(generateCode());
         verCode.setExpirationDate(LocalDateTime.now().plusHours(1L));
         verificationCodeRepo.save(verCode);
-        // TODO: Send email
+        sendEmail(MailDetails.builder()
+                .user(user)
+                .subject("Account code activation")
+                .content(getContentForVerificationCode(user))
+                .build());
         return ApiResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.OK.value())
                 .message("Verification code reassigned")
                 .build();
+    }
+
+    private void sendEmail(MailDetails mailDetails) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+            helper.setFrom(appEmail, "AdBazaar");
+            helper.setTo(mailDetails.getUser().getEmail());
+            helper.setSubject(mailDetails.getSubject());
+            message.setContent(mailDetails.getContent(), "text/html; charset=UTF-8");
+            javaMailSender.send(message);
+        } catch (MessagingException | MailException | UnsupportedEncodingException e) {
+            throw new MailSendException(e.getMessage());
+        }
+    }
+
+    private String getContentForVerificationCode(AppUser user) {
+        var content = """
+                Dear [[userFullName]]!<br>
+                There is your account verification code:<br>
+                <h3>[[verificationCode]]</h3><br>
+                """;
+        content = content.replace("[[userFullName]]", user.getFullName());
+        content = content.replace("[[verificationCode]]", user.getVerificationCode().getCode());
+        return content;
     }
 
     private VerificationCode assignVerificationCode(AppUser user) {

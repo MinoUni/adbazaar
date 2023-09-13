@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.mail.MailSendException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,6 +31,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AccountVerificationException.class)
     public ResponseEntity<Object> handleAccountVerificationException(AccountVerificationException e) {
+        return buildExceptionResponse(e, HttpStatus.BAD_REQUEST, List.of());
+    }
+
+    @ExceptionHandler(MailSendException.class)
+    public ResponseEntity<Object> handleMailSendException(MailSendException e) {
         return buildExceptionResponse(e, HttpStatus.BAD_REQUEST, List.of());
     }
 
