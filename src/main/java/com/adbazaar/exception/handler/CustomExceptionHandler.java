@@ -2,6 +2,7 @@ package com.adbazaar.exception.handler;
 
 import com.adbazaar.dto.ApiError;
 import com.adbazaar.exception.AccessTokenException;
+import com.adbazaar.exception.AccountVerificationException;
 import com.adbazaar.exception.RefreshTokenException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
@@ -26,6 +27,11 @@ import static java.util.stream.Collectors.toList;
 
 @RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(AccountVerificationException.class)
+    public ResponseEntity<Object> handleAccountVerificationException(AccountVerificationException e) {
+        return buildExceptionResponse(e, HttpStatus.BAD_REQUEST, List.of());
+    }
 
     @ExceptionHandler(AccessTokenException.class)
     public ResponseEntity<Object> handleAccessTokenException(AccessTokenException e) {

@@ -1,13 +1,28 @@
 package com.adbazaar.model;
 
 import com.adbazaar.enums.Role;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -26,16 +41,32 @@ public class AppUser implements UserDetails {
     @GeneratedValue
     private Long id;
 
-    @Column(unique = true)
-    private String email;
-
-    private String password;
-
     @Column(name = "full_name")
     private String fullName;
 
+    @Column(unique = true)
+    private String email;
+
+    private String phone;
+
+    @Column(name = "birt_date", columnDefinition = "DATE")
+    private LocalDate dateOfBirth;
+
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Column(name = "verified")
+    private Boolean isVerified;
+
+    @Column(name = "creation_date", columnDefinition = "DATE")
+    private LocalDate creationDate;
+
+    private String password;
+
+    @ToString.Exclude
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private VerificationCode verificationCode;
 
     @ToString.Exclude
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)

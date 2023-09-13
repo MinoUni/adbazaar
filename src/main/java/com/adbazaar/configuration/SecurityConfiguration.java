@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                mvc.pattern("/auth/**"),
+                                mvc.pattern("/authentication/**"),
                                 mvc.pattern("/v2/api-docs"),
                                 mvc.pattern("/v3/api-docs"),
                                 mvc.pattern("/v3/api-docs/**"),

@@ -15,23 +15,27 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
 @ToString
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
-@Table(name = "tokens")
-public class Token {
+@Table(name = "verif_codes")
+public class VerificationCode {
 
     @Id
     @Column(name = "user_id")
     private Long id;
 
-    private String token;
+    private String code;
+
+    @Column(name = "expiration_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime expirationDate;
 
     @MapsId
     @OneToOne
@@ -39,7 +43,7 @@ public class Token {
     private AppUser user;
 
     public void revoke() {
-        user.setToken(null);
+        user.setVerificationCode(null);
         setUser(null);
     }
 
@@ -50,8 +54,8 @@ public class Token {
         Class<?> oEffectiveClass = object instanceof HibernateProxy ? ((HibernateProxy) object).getHibernateLazyInitializer().getPersistentClass() : object.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Token token = (Token) object;
-        return getId() != null && Objects.equals(getId(), token.getId());
+        VerificationCode that = (VerificationCode) object;
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
 
     @Override
