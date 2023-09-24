@@ -1,4 +1,4 @@
-package com.adbazaar.dto;
+package com.adbazaar.dto.authentication;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

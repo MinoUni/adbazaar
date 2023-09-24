@@ -1,12 +1,10 @@
 package com.adbazaar.service;
 
 import com.adbazaar.dto.ApiResponse;
-import com.adbazaar.dto.LoginRequest;
-import com.adbazaar.dto.LoginResponse;
-import com.adbazaar.dto.RegistrationRequest;
-import com.adbazaar.dto.RegistrationResponse;
-import com.adbazaar.dto.UserVerification;
-import com.adbazaar.enums.Role;
+import com.adbazaar.dto.authentication.LoginRequest;
+import com.adbazaar.dto.authentication.LoginResponse;
+import com.adbazaar.dto.authentication.RegistrationRequest;
+import com.adbazaar.dto.authentication.UserVerification;
 import com.adbazaar.exception.AccountVerificationException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
@@ -30,7 +28,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Random;
@@ -62,18 +59,12 @@ public class UserService {
         this.appEmail = applicationEmail;
     }
 
-    public RegistrationResponse register(RegistrationRequest userDetails) {
+    public ApiResponse register(RegistrationRequest userDetails) {
         if (userRepo.existsByEmail(userDetails.getEmail())) {
             throw new UserAlreadyExistException(String.format("User with email %s already exist", userDetails.getEmail()));
         }
-        var user = AppUser.builder()
-                .fullName(userDetails.getFullName())
-                .email(userDetails.getEmail())
-                .password(passwordEncoder.encode(userDetails.getPassword()))
-                .role(Role.ROLE_USER)
-                .isVerified(Boolean.FALSE)
-                .creationDate(LocalDate.now())
-                .build();
+        var user = AppUser.build(userDetails);
+        user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         user.setVerificationCode(assignVerificationCode(user));
         userRepo.save(user);
         sendEmail(MailDetails.builder()
@@ -81,14 +72,17 @@ public class UserService {
                     .subject("Account code activation")
                     .content(getContentForVerificationCode(user))
                     .build());
-        return RegistrationResponse.builder()
-                .email(userDetails.getEmail())
+        return ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CREATED.value())
+                .message(String.format("User created, verification code send to {%s}", userDetails.getEmail()))
                 .build();
     }
 
     public LoginResponse login(LoginRequest userDetails) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDetails.getEmail(), userDetails.getPassword()));
         var user = findUser(userDetails.getEmail());
+//      TODO: Replace with user details
         return LoginResponse.builder()
                 .fullName(user.getFullName())
                 .email(user.getEmail())
@@ -131,11 +125,11 @@ public class UserService {
         verCode.setCode(generateCode());
         verCode.setExpirationDate(LocalDateTime.now().plusHours(1L));
         verificationCodeRepo.save(verCode);
-        sendEmail(MailDetails.builder()
-                .user(user)
-                .subject("Account code activation")
-                .content(getContentForVerificationCode(user))
-                .build());
+//        sendEmail(MailDetails.builder()
+//                .user(user)
+//                .subject("Account code activation")
+//                .content(getContentForVerificationCode(user))
+//                .build());
         return ApiResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.OK.value())

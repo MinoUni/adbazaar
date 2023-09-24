@@ -3,6 +3,7 @@ package com.adbazaar.exception.handler;
 import com.adbazaar.dto.ApiError;
 import com.adbazaar.exception.AccessTokenException;
 import com.adbazaar.exception.AccountVerificationException;
+import com.adbazaar.exception.ProductNotFoundException;
 import com.adbazaar.exception.RefreshTokenException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.mail.MailSendException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +31,16 @@ import static java.util.stream.Collectors.toList;
 @RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<Object> handleProductNotFoundException(ProductNotFoundException e) {
+        return buildExceptionResponse(e, HttpStatus.NOT_FOUND, List.of());
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException e) {
+        return buildExceptionResponse(e, HttpStatus.NOT_FOUND, List.of());
+    }
+
     @ExceptionHandler(AccountVerificationException.class)
     public ResponseEntity<Object> handleAccountVerificationException(AccountVerificationException e) {
         return buildExceptionResponse(e, HttpStatus.BAD_REQUEST, List.of());
@@ -44,10 +56,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildExceptionResponse(e, HttpStatus.UNAUTHORIZED, List.of());
     }
 
-    /**
-     * TODO: Think about refresh token exception and his status code
-     * @see com.adbazaar.security.JwtService#revokeRefreshToken(String)
-     */
     @ExceptionHandler(RefreshTokenException.class)
     public ResponseEntity<Object> handleRefreshTokenException(RefreshTokenException e) {
         return buildExceptionResponse(e, HttpStatus.NOT_FOUND, List.of());

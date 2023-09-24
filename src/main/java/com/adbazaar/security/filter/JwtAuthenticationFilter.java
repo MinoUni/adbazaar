@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = userDetailsService.loadUserByUsername(username);
             if (!jwtService.isAccessTokenValid(jwt, userDetails)) {
-                throw new AccessTokenException("Provided invalid or expired access token");
+                throw new AccessTokenException("Invalid/Outdated access token");
             }
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

@@ -1,12 +1,11 @@
 package com.adbazaar.controller;
 
 import com.adbazaar.dto.ApiResponse;
-import com.adbazaar.dto.LoginRequest;
-import com.adbazaar.dto.LoginResponse;
-import com.adbazaar.dto.RefreshTokenRequest;
-import com.adbazaar.dto.RegistrationRequest;
-import com.adbazaar.dto.RegistrationResponse;
-import com.adbazaar.dto.UserVerification;
+import com.adbazaar.dto.authentication.LoginRequest;
+import com.adbazaar.dto.authentication.LoginResponse;
+import com.adbazaar.dto.authentication.RefreshTokenRequest;
+import com.adbazaar.dto.authentication.RegistrationRequest;
+import com.adbazaar.dto.authentication.UserVerification;
 import com.adbazaar.security.JwtService;
 import com.adbazaar.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +32,7 @@ public class AuthenticationController {
     private final JwtService jwtService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody RegistrationRequest userDetails) {
+    public ResponseEntity<ApiResponse> register(@Valid @RequestBody RegistrationRequest userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(userDetails));
     }
 
