@@ -28,6 +28,10 @@ public class ProductDetails {
 
     private String format;
 
+    private BigDecimal rate;
+
+    private Integer quantity;
+
     private BigDecimal price;
 
     private String genre;
@@ -48,6 +52,8 @@ public class ProductDetails {
                 .imagePath(product.getImagePath())
                 .format(product.getFormat())
                 .price(product.getPrice())
+                .rate(product.getRate())
+                .quantity(product.getQuantity())
                 .genre(product.getGenre())
                 .publishHouse(product.getPublishHouse())
                 .language(product.getLanguage())
