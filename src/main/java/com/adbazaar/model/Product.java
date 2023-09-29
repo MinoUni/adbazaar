@@ -3,11 +3,13 @@ package com.adbazaar.model;
 import com.adbazaar.dto.product.CreateProductReq;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,13 +19,15 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"seller", "comments"})
 @Entity
 @Table(name = "products")
 public class Product {
@@ -63,10 +67,13 @@ public class Product {
     @Column(name = "publishing_house")
     private String publishHouse;
 
-    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser seller;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+    private List<Comment> comments = new ArrayList<>();
 
     public static Product build(CreateProductReq details, AppUser user) {
         return Product.builder()

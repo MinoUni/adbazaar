@@ -17,8 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -36,18 +35,19 @@ public class ProductService {
         var product = Product.build(productDetails, user);
         productRepo.save(product);
         return ApiResponse.builder()
-                .message("Product created")
                 .status(HttpStatus.CREATED.value())
-                .timestamp(LocalDateTime.now())
+                .message("Product created")
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public ProductDetails findById(Long id) {
         return productRepo.findById(id)
                 .map(ProductDetails::build)
                 .orElseThrow(() -> new ProductNotFoundException(String.format("Product with id {%d} not found", id)));
     }
 
+    @Transactional(readOnly = true)
     public Page<ProductShortDetails> findAll(Pageable pageable) {
         return productRepo.findAllBy(pageable);
     }
@@ -58,7 +58,6 @@ public class ProductService {
         }
         productRepo.deleteById(id);
         return ApiResponse.builder()
-                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.OK.value())
                 .message(String.format("Product with id {%d} deleted", id))
                 .build();
@@ -70,7 +69,6 @@ public class ProductService {
         mapper.updateProduct(details, product);
         productRepo.save(product);
         return ApiResponse.builder()
-                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.OK.value())
                 .message(String.format("Product with id {%d} updated", id))
                 .build();

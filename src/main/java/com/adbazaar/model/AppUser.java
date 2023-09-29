@@ -20,7 +20,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,14 +28,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"verificationCode", "token", "products", "comments"})
 @Entity
 @Table(name = "users")
 public class AppUser implements UserDetails {
@@ -67,18 +65,19 @@ public class AppUser implements UserDetails {
 
     private String password;
 
-    @ToString.Exclude
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private VerificationCode verificationCode;
 
-    @ToString.Exclude
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private Token token;
 
     @OneToMany(mappedBy = "seller", fetch = FetchType.EAGER)
     private List<Product> products = new ArrayList<>();
+
+    @OneToMany(mappedBy = "author", fetch = FetchType.EAGER)
+    private List<Comment> comments = new ArrayList<>();
 
     public static AppUser build(RegistrationRequest userDetails) {
         return AppUser.builder()
@@ -125,19 +124,4 @@ public class AppUser implements UserDetails {
         return true;
     }
 
-    @Override
-    public final boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null) return false;
-        Class<?> oEffectiveClass = object instanceof HibernateProxy ? ((HibernateProxy) object).getHibernateLazyInitializer().getPersistentClass() : object.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
-        if (thisEffectiveClass != oEffectiveClass) return false;
-        AppUser appUser = (AppUser) object;
-        return getId() != null && Objects.equals(getId(), appUser.getId());
-    }
-
-    @Override
-    public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
-    }
 }
