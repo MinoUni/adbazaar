@@ -1,6 +1,6 @@
 package com.adbazaar.service;
 
-import com.adbazaar.dto.ApiResponse;
+import com.adbazaar.dto.ApiResp;
 import com.adbazaar.dto.authentication.LoginRequest;
 import com.adbazaar.dto.authentication.LoginResponse;
 import com.adbazaar.dto.authentication.RegistrationRequest;
@@ -59,7 +59,7 @@ public class UserService {
         this.appEmail = applicationEmail;
     }
 
-    public ApiResponse register(RegistrationRequest userDetails) {
+    public ApiResp register(RegistrationRequest userDetails) {
         if (userRepo.existsByEmail(userDetails.getEmail())) {
             throw new UserAlreadyExistException(String.format("User with email %s already exist", userDetails.getEmail()));
         }
@@ -72,8 +72,7 @@ public class UserService {
                     .subject("Account code activation")
                     .content(getContentForVerificationCode(user))
                     .build());
-        return ApiResponse.builder()
-                .timestamp(LocalDateTime.now())
+        return ApiResp.builder()
                 .status(HttpStatus.CREATED.value())
                 .message(String.format("User created, verification code send to {%s}", userDetails.getEmail()))
                 .build();
@@ -92,7 +91,7 @@ public class UserService {
                 .build();
     }
 
-    public ApiResponse verifyCode(UserVerification userDetails) {
+    public ApiResp verifyCode(UserVerification userDetails) {
         var user = findUser(userDetails.getEmail());
         if (user.getIsVerified()) {
             throw new AccountVerificationException("Account already verified");
@@ -109,14 +108,13 @@ public class UserService {
         verificationCodeRepo.delete(userVerificationCode);
         user.setIsVerified(Boolean.TRUE);
         userRepo.save(user);
-        return ApiResponse.builder()
-                .timestamp(now)
+        return ApiResp.builder()
                 .status(HttpStatus.OK.value())
                 .message("Account verification successful")
                 .build();
     }
 
-    public ApiResponse reassignVerificationCode(String email) {
+    public ApiResp reassignVerificationCode(String email) {
         var user = findUser(email);
         if (user.getIsVerified()) {
             throw new AccountVerificationException("Account already verified");
@@ -130,8 +128,7 @@ public class UserService {
 //                .subject("Account code activation")
 //                .content(getContentForVerificationCode(user))
 //                .build());
-        return ApiResponse.builder()
-                .timestamp(LocalDateTime.now())
+        return ApiResp.builder()
                 .status(HttpStatus.OK.value())
                 .message("Verification code reassigned")
                 .build();

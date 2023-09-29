@@ -1,6 +1,6 @@
 package com.adbazaar.controller;
 
-import com.adbazaar.dto.ApiResponse;
+import com.adbazaar.dto.ApiResp;
 import com.adbazaar.dto.product.CreateProductReq;
 import com.adbazaar.dto.product.ProductDetails;
 import com.adbazaar.dto.product.ProductShortDetails;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor
-@Tag(name = "Product Management")
+@Tag(name = "Products Management")
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -33,8 +33,8 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse> addNewProduct(@RequestHeader(AUTHORIZATION) String token,
-                                                     @RequestBody CreateProductReq productDetails) {
+    public ResponseEntity<ApiResp> addNewProduct(@RequestHeader(AUTHORIZATION) String token,
+                                                 @RequestBody CreateProductReq productDetails) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(productDetails, token));
     }
 
@@ -49,13 +49,13 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteById(@PathVariable("id") Long id) {
+    public ResponseEntity<ApiResp> deleteById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(productService.deleteById(id));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateById(@PathVariable("id") Long id,
-                                                  @RequestBody ProductUpdate details) {
+    public ResponseEntity<ApiResp> updateById(@PathVariable("id") Long id,
+                                              @RequestBody ProductUpdate details) {
         return ResponseEntity.ok(productService.update(id, details));
     }
 }

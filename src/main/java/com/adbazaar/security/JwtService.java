@@ -1,5 +1,6 @@
 package com.adbazaar.security;
 
+import com.adbazaar.dto.ApiResp;
 import com.adbazaar.exception.RefreshTokenException;
 import com.adbazaar.model.AppUser;
 import com.adbazaar.model.Token;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -101,7 +103,7 @@ public class JwtService {
         return token;
     }
 
-    public void revokeRefreshToken(String refreshToken) {
+    public ApiResp revokeRefreshToken(String refreshToken) {
         final var userId = extractUserIdFromRefreshToken(refreshToken);
         var token = tokenRepo.findById(userId)
                 .orElseThrow(() -> new RefreshTokenException(String.format("Token with id %d not found", userId)));
@@ -110,6 +112,10 @@ public class JwtService {
         }
         token.revoke();
         tokenRepo.delete(token);
+        return ApiResp.builder()
+                .status(HttpStatus.OK.value())
+                .message("Refresh token revoked")
+                .build();
     }
 
     private Claims extractClaims(String token, String secret) {

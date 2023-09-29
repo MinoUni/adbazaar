@@ -73,9 +73,11 @@ public class AppUser implements UserDetails {
     @PrimaryKeyJoinColumn
     private Token token;
 
+    @Builder.Default
     @OneToMany(mappedBy = "seller", fetch = FetchType.EAGER)
     private List<Product> products = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "author", fetch = FetchType.EAGER)
     private List<Comment> comments = new ArrayList<>();
 

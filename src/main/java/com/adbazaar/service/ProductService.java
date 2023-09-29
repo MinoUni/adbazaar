@@ -1,6 +1,6 @@
 package com.adbazaar.service;
 
-import com.adbazaar.dto.ApiResponse;
+import com.adbazaar.dto.ApiResp;
 import com.adbazaar.dto.product.CreateProductReq;
 import com.adbazaar.dto.product.ProductDetails;
 import com.adbazaar.dto.product.ProductShortDetails;
@@ -28,13 +28,13 @@ public class ProductService {
     private final CustomMapper mapper;
     private final JwtService jwtService;
 
-    public ApiResponse create(CreateProductReq productDetails, String token) {
+    public ApiResp create(CreateProductReq productDetails, String token) {
         var email = jwtService.extractUsernameFromAccessToken(token.substring(7));
         var user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with email {%s} not found", email)));
         var product = Product.build(productDetails, user);
         productRepo.save(product);
-        return ApiResponse.builder()
+        return ApiResp.builder()
                 .status(HttpStatus.CREATED.value())
                 .message("Product created")
                 .build();
@@ -52,23 +52,23 @@ public class ProductService {
         return productRepo.findAllBy(pageable);
     }
 
-    public ApiResponse deleteById(Long id) {
+    public ApiResp deleteById(Long id) {
         if (!productRepo.existsById(id)) {
             throw new ProductNotFoundException(String.format("Product with id {%d} not found", id));
         }
         productRepo.deleteById(id);
-        return ApiResponse.builder()
+        return ApiResp.builder()
                 .status(HttpStatus.OK.value())
                 .message(String.format("Product with id {%d} deleted", id))
                 .build();
     }
 
-    public ApiResponse update(Long id, ProductUpdate details) {
+    public ApiResp update(Long id, ProductUpdate details) {
         var product = productRepo.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(String.format("Product with id {%d} not found", id)));
         mapper.updateProduct(details, product);
         productRepo.save(product);
-        return ApiResponse.builder()
+        return ApiResp.builder()
                 .status(HttpStatus.OK.value())
                 .message(String.format("Product with id {%d} updated", id))
                 .build();

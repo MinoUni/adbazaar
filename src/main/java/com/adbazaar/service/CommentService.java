@@ -1,6 +1,6 @@
 package com.adbazaar.service;
 
-import com.adbazaar.dto.ApiResponse;
+import com.adbazaar.dto.ApiResp;
 import com.adbazaar.dto.comment.CommentDetails;
 import com.adbazaar.dto.comment.NewComment;
 import com.adbazaar.exception.ProductNotFoundException;
@@ -23,14 +23,14 @@ public class CommentService {
     private final UserRepository userRepo;
     private final ProductRepository productRepo;
 
-    public ApiResponse create(NewComment commentDetails) {
+    public ApiResp create(NewComment commentDetails) {
         var user = userRepo.findById(commentDetails.getUserId())
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with id {%d} not found", commentDetails.getUserId())));
         var product = productRepo.findById(commentDetails.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException(String.format("Product with id {%d} not found", commentDetails.getProductId())));
         var comment = Comment.build(commentDetails, user, product);
         commentRepo.save(comment);
-        return ApiResponse.builder()
+        return ApiResp.builder()
                 .status(HttpStatus.CREATED.value())
                 .message("Comment created")
                 .build();
