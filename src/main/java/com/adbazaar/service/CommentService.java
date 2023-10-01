@@ -1,7 +1,7 @@
 package com.adbazaar.service;
 
 import com.adbazaar.dto.ApiResp;
-import com.adbazaar.dto.comment.CommentDetails;
+import com.adbazaar.dto.comment.ProductComment;
 import com.adbazaar.dto.comment.NewComment;
 import com.adbazaar.exception.ProductNotFoundException;
 import com.adbazaar.exception.UserNotFoundException;
@@ -36,14 +36,14 @@ public class CommentService {
                 .build();
     }
 
-    public List<CommentDetails> findCommentsByUserId(Long id) {
+    public List<ProductComment> findCommentsByUserId(Long id) {
         if (!userRepo.existsById(id)) {
             throw new UserNotFoundException(String.format("User with id {%d} not found", id));
         }
         return commentRepo.findAllByUserId(id);
     }
 
-    public List<CommentDetails> findCommentsByProductId(Long id) {
+    public List<ProductComment> findCommentsByProductId(Long id) {
         if (!productRepo.existsById(id)) {
             throw new ProductNotFoundException(String.format("User with id {%d} not found", id));
         }

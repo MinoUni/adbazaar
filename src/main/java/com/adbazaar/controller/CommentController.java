@@ -1,7 +1,7 @@
 package com.adbazaar.controller;
 
 import com.adbazaar.dto.ApiResp;
-import com.adbazaar.dto.comment.CommentDetails;
+import com.adbazaar.dto.comment.ProductComment;
 import com.adbazaar.dto.comment.NewComment;
 import com.adbazaar.service.CommentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +32,7 @@ public class CommentController {
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<List<CommentDetails>> getCommentsByUserId(@PathVariable("id") Long id) {
+    public ResponseEntity<List<ProductComment>> getCommentsByUserId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(messageService.findCommentsByUserId(id));
     }
 }

@@ -5,11 +5,16 @@ import com.adbazaar.dto.authentication.LoginRequest;
 import com.adbazaar.dto.authentication.LoginResponse;
 import com.adbazaar.dto.authentication.RegistrationRequest;
 import com.adbazaar.dto.authentication.UserVerification;
+import com.adbazaar.dto.comment.UserComment;
+import com.adbazaar.dto.product.UserProduct;
+import com.adbazaar.dto.user.UserDetails;
 import com.adbazaar.exception.AccountVerificationException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
 import com.adbazaar.model.AppUser;
 import com.adbazaar.model.VerificationCode;
+import com.adbazaar.repository.CommentRepository;
+import com.adbazaar.repository.ProductRepository;
 import com.adbazaar.repository.UserRepository;
 import com.adbazaar.repository.VerificationCodeRepository;
 import com.adbazaar.security.JwtService;
@@ -29,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -36,15 +42,19 @@ import java.util.Random;
 public class UserService {
 
     private final UserRepository userRepo;
+    private final VerificationCodeRepository verificationCodeRepo;
+    private final ProductRepository productRepo;
+    private final CommentRepository commentRepo;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
-    private final VerificationCodeRepository verificationCodeRepo;
     private final JavaMailSender javaMailSender;
     private final String appEmail;
 
     public UserService(UserRepository userRepo,
                        VerificationCodeRepository verificationCodeRepo,
+                       ProductRepository productRepo,
+                       CommentRepository commentRepo,
                        JwtService jwtService,
                        JavaMailSender javaMailSender,
                        AuthenticationManager authenticationManager,
@@ -52,6 +62,8 @@ public class UserService {
                        @Value("spring.mail.username") String applicationEmail) {
         this.userRepo = userRepo;
         this.verificationCodeRepo = verificationCodeRepo;
+        this.productRepo = productRepo;
+        this.commentRepo = commentRepo;
         this.jwtService = jwtService;
         this.javaMailSender = javaMailSender;
         this.authenticationManager = authenticationManager;
@@ -81,11 +93,7 @@ public class UserService {
     public LoginResponse login(LoginRequest userDetails) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDetails.getEmail(), userDetails.getPassword()));
         var user = findUser(userDetails.getEmail());
-//      TODO: Replace with user details
         return LoginResponse.builder()
-                .fullName(user.getFullName())
-                .email(user.getEmail())
-                .role(user.getRole().name())
                 .accessToken(jwtService.generateAccessToken(user))
                 .refreshToken(jwtService.assignRefreshToken(user))
                 .build();
@@ -167,12 +175,20 @@ public class UserService {
                 .build();
     }
 
-    private static String generateCode() {
+    private String generateCode() {
         return String.format("%04d", new Random().nextInt(10_000));
     }
 
     private AppUser findUser(String email) {
         return userRepo.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with email %s not found", email)));
+    }
+
+    public UserDetails findByAccessToken(String token) {
+        var email = jwtService.extractUsernameFromAccessToken(token.substring(7));
+        var user = findUser(email);
+        List<UserProduct> products = productRepo.findAllUserProducts(user.getId());
+        List<UserComment> comments = commentRepo.findAllUserComments(user.getId());
+        return UserDetails.build(user, products, comments);
     }
 }

@@ -12,14 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoginResponse {
 
-    @JsonProperty("full_name")
-    private String fullName;
-
-    private String email;
-
-    @JsonProperty("user_role")
-    private String role;
-
     @JsonProperty("access_token")
     private String accessToken;
 
