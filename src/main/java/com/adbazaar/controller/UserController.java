@@ -28,7 +28,7 @@ public class UserController {
 
     @Operation(
             summary = "Find user details using JWT access token",
-            description = "Find user details in database by extracting claims from JWT access token",
+            description = "Find user details(lists of orders, favorites, comments and products) in database by extracting claims from JWT access token",
             responses = {
                     @ApiResponse(responseCode = "200",
                             description = "User details fetched",
@@ -44,8 +44,8 @@ public class UserController {
                             content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))})
             }
     )
-    @GetMapping
+    @GetMapping("/token")
     public ResponseEntity<UserDetails> getUserByAccessToken(@RequestHeader(AUTHORIZATION) String token) {
-        return ResponseEntity.ok(userService.findByAccessToken(token));
+        return ResponseEntity.ok(userService.findUserDetailsByAccessToken(token));
     }
 }
