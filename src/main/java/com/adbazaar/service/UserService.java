@@ -4,96 +4,80 @@ import com.adbazaar.dto.ApiResp;
 import com.adbazaar.dto.authentication.LoginRequest;
 import com.adbazaar.dto.authentication.LoginResponse;
 import com.adbazaar.dto.authentication.RegistrationRequest;
+import com.adbazaar.dto.authentication.RegistrationResponse;
 import com.adbazaar.dto.authentication.UserVerification;
+import com.adbazaar.dto.book.UserBook;
 import com.adbazaar.dto.comment.UserComment;
-import com.adbazaar.dto.product.UserProduct;
 import com.adbazaar.dto.user.UserDetails;
 import com.adbazaar.exception.AccountVerificationException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
 import com.adbazaar.model.AppUser;
 import com.adbazaar.model.VerificationCode;
+import com.adbazaar.repository.BookRepository;
 import com.adbazaar.repository.CommentRepository;
-import com.adbazaar.repository.ProductRepository;
 import com.adbazaar.repository.UserRepository;
-import com.adbazaar.repository.VerificationCodeRepository;
+import com.adbazaar.repository.UserVerifyTokenRepository;
 import com.adbazaar.security.JwtService;
-import com.adbazaar.utils.MailDetails;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Value;
+import com.adbazaar.utils.MailUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.MailException;
-import org.springframework.mail.MailSendException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
+import static com.adbazaar.utils.MessageUtils.USER_ALREADY_EXIST;
+import static com.adbazaar.utils.MessageUtils.USER_ALREADY_VERIFIED;
+import static com.adbazaar.utils.MessageUtils.USER_NOT_FOUND_BY_EMAIL;
+import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_CODE_EXPIRED;
+import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_INVALID_CODE;
+import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_REASSIGNED;
+import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_SUCCESSFUL;
+import static com.adbazaar.utils.MessageUtils.VERIFICATION_MAIL_SUBJECT;
+
+@RequiredArgsConstructor
 @Service
 public class UserService {
 
     private final UserRepository userRepo;
-    private final VerificationCodeRepository verificationCodeRepo;
-    private final ProductRepository productRepo;
+
+    private final BookRepository bookRepo;
+
+    private final UserVerifyTokenRepository userVerifyTokenRepo;
+
     private final CommentRepository commentRepo;
+
     private final JwtService jwtService;
+
     private final AuthenticationManager authenticationManager;
+
     private final PasswordEncoder passwordEncoder;
-    private final JavaMailSender javaMailSender;
-    private final String appEmail;
 
-    public UserService(UserRepository userRepo,
-                       VerificationCodeRepository verificationCodeRepo,
-                       ProductRepository productRepo,
-                       CommentRepository commentRepo,
-                       JwtService jwtService,
-                       JavaMailSender javaMailSender,
-                       AuthenticationManager authenticationManager,
-                       PasswordEncoder passwordEncoder,
-                       @Value("spring.mail.username") String applicationEmail) {
-        this.userRepo = userRepo;
-        this.verificationCodeRepo = verificationCodeRepo;
-        this.productRepo = productRepo;
-        this.commentRepo = commentRepo;
-        this.jwtService = jwtService;
-        this.javaMailSender = javaMailSender;
-        this.authenticationManager = authenticationManager;
-        this.passwordEncoder = passwordEncoder;
-        this.appEmail = applicationEmail;
-    }
+    private final MailUtils mailUtils;
 
-    public ApiResp register(RegistrationRequest userDetails) {
+    public RegistrationResponse register(RegistrationRequest userDetails) {
         if (userRepo.existsByEmail(userDetails.getEmail())) {
-            throw new UserAlreadyExistException(String.format("User with email %s already exist", userDetails.getEmail()));
+            throw new UserAlreadyExistException(String.format(USER_ALREADY_EXIST, userDetails.getEmail()));
         }
+        userDetails.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         var user = AppUser.build(userDetails);
-        user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
-        user.setVerificationCode(assignVerificationCode(user));
+        var code = userVerifyTokenRepo.save(user.getEmail(), VerificationCode.build(user.getEmail()));
         userRepo.save(user);
-        sendEmail(MailDetails.builder()
-                    .user(user)
-                    .subject("Account code activation")
-                    .content(getContentForVerificationCode(user))
-                    .build());
-        return ApiResp.builder()
-                .status(HttpStatus.CREATED.value())
-                .message(String.format("User created, verification code send to {%s}", userDetails.getEmail()))
-                .build();
+        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
+        return RegistrationResponse.builder().email(user.getEmail()).build();
     }
 
     public LoginResponse login(LoginRequest userDetails) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDetails.getEmail(), userDetails.getPassword()));
         var user = findUser(userDetails.getEmail());
         return LoginResponse.builder()
+                .fullName(user.getFullName())
+                .email(user.getEmail())
                 .accessToken(jwtService.generateAccessToken(user))
                 .refreshToken(jwtService.assignRefreshToken(user))
                 .build();
@@ -101,94 +85,42 @@ public class UserService {
 
     public ApiResp verifyCode(UserVerification userDetails) {
         var user = findUser(userDetails.getEmail());
+        var code = userVerifyTokenRepo.findByEmail(user.getEmail());
         if (user.getIsVerified()) {
-            throw new AccountVerificationException("Account already verified");
+            throw new AccountVerificationException(String.format(USER_ALREADY_VERIFIED, user.getEmail()));
         }
-        var now = LocalDateTime.now();
-        if (!now.isBefore(user.getVerificationCode().getExpirationDate())) {
-            throw new AccountVerificationException("Code expired");
+        if (!LocalDateTime.now().isBefore(code.getExpirationDate())) {
+            throw new AccountVerificationException(String.format(USER_VERIFICATION_CODE_EXPIRED, user.getEmail()));
         }
-        if (!Objects.equals(userDetails.getVerificationCode(), user.getVerificationCode().getCode())) {
-            throw new AccountVerificationException("Invalid code");
+        if (!Objects.equals(userDetails.getVerificationCode(), code.getCode())) {
+            throw new AccountVerificationException(String.format(USER_VERIFICATION_INVALID_CODE, user.getEmail()));
         }
-        var userVerificationCode = user.getVerificationCode();
-        userVerificationCode.revoke();
-        verificationCodeRepo.delete(userVerificationCode);
+        userVerifyTokenRepo.delete(user.getEmail());
         user.setIsVerified(Boolean.TRUE);
         userRepo.save(user);
-        return ApiResp.builder()
-                .status(HttpStatus.OK.value())
-                .message("Account verification successful")
-                .build();
+        return ApiResp.build(HttpStatus.OK, String.format(USER_VERIFICATION_SUCCESSFUL, user.getEmail()));
     }
 
     public ApiResp reassignVerificationCode(String email) {
         var user = findUser(email);
         if (user.getIsVerified()) {
-            throw new AccountVerificationException("Account already verified");
+            throw new AccountVerificationException(String.format(USER_ALREADY_VERIFIED, user.getEmail()));
         }
-        var verCode = user.getVerificationCode();
-        verCode.setCode(generateCode());
-        verCode.setExpirationDate(LocalDateTime.now().plusHours(1L));
-        verificationCodeRepo.save(verCode);
-//        sendEmail(MailDetails.builder()
-//                .user(user)
-//                .subject("Account code activation")
-//                .content(getContentForVerificationCode(user))
-//                .build());
-        return ApiResp.builder()
-                .status(HttpStatus.OK.value())
-                .message("Verification code reassigned")
-                .build();
+        var code = userVerifyTokenRepo.save(user.getEmail(), VerificationCode.build(user.getEmail()));
+        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
+        return ApiResp.build(HttpStatus.OK, String.format(USER_VERIFICATION_REASSIGNED, email));
     }
 
-    private void sendEmail(MailDetails mailDetails) {
-        try {
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message);
-            helper.setFrom(appEmail, "AdBazaar");
-            helper.setTo(mailDetails.getUser().getEmail());
-            helper.setSubject(mailDetails.getSubject());
-            message.setContent(mailDetails.getContent(), "text/html; charset=UTF-8");
-            javaMailSender.send(message);
-        } catch (MessagingException | MailException | UnsupportedEncodingException e) {
-            throw new MailSendException(e.getMessage());
-        }
-    }
-
-    private String getContentForVerificationCode(AppUser user) {
-        var content = """
-                Dear [[userFullName]]!<br>
-                There is your account verification code:<br>
-                <h3>[[verificationCode]]</h3><br>
-                """;
-        content = content.replace("[[userFullName]]", user.getFullName());
-        content = content.replace("[[verificationCode]]", user.getVerificationCode().getCode());
-        return content;
-    }
-
-    private VerificationCode assignVerificationCode(AppUser user) {
-        return VerificationCode.builder()
-                .user(user)
-                .code(generateCode())
-                .expirationDate(LocalDateTime.now().plusHours(1L))
-                .build();
-    }
-
-    private String generateCode() {
-        return String.format("%04d", new Random().nextInt(10_000));
+    public UserDetails findUserDetailsByAccessToken(String token) {
+        var email = jwtService.extractUsernameFromAccessToken(token.substring(7));
+        var user = findUser(email);
+        List<UserBook> books = bookRepo.findAllUserBooks(user.getId());
+        List<UserComment> comments = commentRepo.findAllUserComments(user.getId());
+        return UserDetails.build(user, books, comments);
     }
 
     private AppUser findUser(String email) {
         return userRepo.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User with email %s not found", email)));
-    }
-
-    public UserDetails findByAccessToken(String token) {
-        var email = jwtService.extractUsernameFromAccessToken(token.substring(7));
-        var user = findUser(email);
-        List<UserProduct> products = productRepo.findAllUserProducts(user.getId());
-        List<UserComment> comments = commentRepo.findAllUserComments(user.getId());
-        return UserDetails.build(user, products, comments);
+                .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_EMAIL, email)));
     }
 }
