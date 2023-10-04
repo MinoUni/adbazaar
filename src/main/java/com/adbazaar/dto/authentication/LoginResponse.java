@@ -12,6 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoginResponse {
 
+    @JsonProperty("full_name")
+    private String fullName;
+
+    private String email;
+
     @JsonProperty("access_token")
     private String accessToken;
 

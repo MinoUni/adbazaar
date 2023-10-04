@@ -1,7 +1,7 @@
 package com.adbazaar.dto.user;
 
 import com.adbazaar.dto.comment.UserComment;
-import com.adbazaar.dto.product.UserProduct;
+import com.adbazaar.dto.book.UserBook;
 import com.adbazaar.model.AppUser;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -46,9 +46,9 @@ public class UserDetails {
     private List<UserComment> comments = new ArrayList<>();
 
     @Builder.Default
-    private List<UserProduct> products = new ArrayList<>();
+    private List<UserBook> books = new ArrayList<>();
 
-    public static UserDetails build(AppUser user, List<UserProduct> products, List<UserComment> comments) {
+    public static UserDetails build(AppUser user, List<UserBook> books, List<UserComment> comments) {
         return UserDetails.builder()
                 .id(user.getId())
                 .isVerified(user.getIsVerified())
@@ -57,7 +57,7 @@ public class UserDetails {
                 .phone(user.getPhone())
                 .dateOfBirth(user.getDateOfBirth())
                 .comments(comments)
-                .products(products)
+                .books(books)
                 .build();
     }
 }
