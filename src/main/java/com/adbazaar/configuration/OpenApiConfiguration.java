@@ -22,7 +22,10 @@ import org.springframework.context.annotation.Configuration;
                         url = "https://github.com/MinoUni"
                 )
         ),
-        servers = {@Server(url = "http://localhost:8080", description = "Local dev ENV")},
+        servers = {
+                @Server(url = "http://localhost:8080", description = "Local dev ENV"),
+                @Server(url = "http://13.40.103.28:8080", description = "Amazon vm ENV")
+        },
         security = {@SecurityRequirement(name = "bearerAuth")}
 )
 @SecuritySchemes(
