@@ -3,9 +3,7 @@ package com.adbazaar.security;
 import com.adbazaar.dto.ApiResp;
 import com.adbazaar.exception.RefreshTokenException;
 import com.adbazaar.model.AppUser;
-import com.adbazaar.model.Token;
-import com.adbazaar.repository.TokenRepository;
-import com.adbazaar.repository.UserRepository;
+import com.adbazaar.repository.UserJwtTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -19,31 +17,35 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Objects;
 import java.util.function.Function;
+
+import static com.adbazaar.utils.MessageUtils.REFRESH_TOKEN_INVALID_OR_EXPIRED;
+import static com.adbazaar.utils.MessageUtils.REFRESH_TOKEN_NOT_FOUND;
+import static com.adbazaar.utils.MessageUtils.REFRESH_TOKEN_REVOKED;
 
 @Service
 public class JwtService {
 
     private final String accessSecretKey;
+
     private final Integer accessExpirationMinutes;
+
     private final String refreshSecretKey;
+
     private final Integer refreshExpirationDays;
-    private final TokenRepository tokenRepo;
-    private final UserRepository userRepo;
+
+    private final UserJwtTokenRepository tokenRepo;
 
     public JwtService(@Value("${application.security.jwt.access.secret-key}") String accessSecretKey,
                       @Value("${application.security.jwt.access.expiration-minutes}") Integer accessExpirationMinutes,
                       @Value("${application.security.jwt.refresh.secret-key}") String refreshSecretKey,
                       @Value("${application.security.jwt.refresh.expiration-days}") Integer refreshExpirationDays,
-                      TokenRepository tokenRepo,
-                      UserRepository userRepo) {
+                      UserJwtTokenRepository tokenRepo) {
         this.accessSecretKey = accessSecretKey;
         this.accessExpirationMinutes = accessExpirationMinutes;
         this.refreshSecretKey = refreshSecretKey;
         this.refreshExpirationDays = refreshExpirationDays;
         this.tokenRepo = tokenRepo;
-        this.userRepo = userRepo;
     }
 
     public String generateAccessToken(UserDetails user) {
@@ -61,7 +63,7 @@ public class JwtService {
         Calendar calendar = getCalendar();
         calendar.add(Calendar.DAY_OF_WEEK, refreshExpirationDays);
         return Jwts.builder()
-                .setSubject(String.valueOf(user.getId()))
+                .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(calendar.getTime())
                 .signWith(getSignInKey(refreshSecretKey), SignatureAlgorithm.HS256)
@@ -73,17 +75,16 @@ public class JwtService {
         return username.equals(userDetails.getUsername()) && isTokenExpired(token, accessSecretKey);
     }
 
-    public boolean isRefreshTokenValid(String refreshToken, Token token) {
-        var userId = extractUserIdFromRefreshToken(refreshToken);
-        return Objects.equals(userId, token.getId()) && isTokenExpired(refreshToken, refreshSecretKey);
+    public boolean isRefreshTokenValid(String refreshToken, String token) {
+        return refreshToken.equals(token) && isTokenExpired(refreshToken, refreshSecretKey);
     }
 
     public String extractUsernameFromAccessToken(String token) {
         return extractClaim(token, accessSecretKey, Claims::getSubject);
     }
 
-    public Long extractUserIdFromRefreshToken(String token) {
-        return Long.valueOf(extractClaim(token, refreshSecretKey, Claims::getSubject));
+    public String extractUserEmailFromRefreshToken(String token) {
+        return extractClaim(token, refreshSecretKey, Claims::getSubject);
     }
 
     public <T> T extractClaim(String token, String secret, Function<Claims, T> claimsResolver) {
@@ -92,29 +93,20 @@ public class JwtService {
     }
 
     public String assignRefreshToken(AppUser user) {
-        var token = generateRefreshToken(user);
-        if (user.getToken() == null) {
-            user.setToken(Token.builder().user(user).token(token).build());
-            userRepo.save(user);
-            return token;
-        }
-        user.getToken().setToken(token);
-        userRepo.save(user);
-        return token;
+        return tokenRepo.save(user.getEmail(), generateRefreshToken(user));
     }
 
     public ApiResp revokeRefreshToken(String refreshToken) {
-        final var userId = extractUserIdFromRefreshToken(refreshToken);
-        var token = tokenRepo.findById(userId)
-                .orElseThrow(() -> new RefreshTokenException(String.format("Token with id %d not found", userId)));
+        final var email = extractUserEmailFromRefreshToken(refreshToken);
+        var token = tokenRepo.findByEmail(email)
+                .orElseThrow(() -> new RefreshTokenException(String.format(REFRESH_TOKEN_NOT_FOUND, email)));
         if (!isRefreshTokenValid(refreshToken, token)) {
-            throw new RefreshTokenException("Refresh token is invalid or has been expired");
+            throw new RefreshTokenException(REFRESH_TOKEN_INVALID_OR_EXPIRED);
         }
-        token.revoke();
-        tokenRepo.delete(token);
+        tokenRepo.delete(email);
         return ApiResp.builder()
                 .status(HttpStatus.OK.value())
-                .message("Refresh token revoked")
+                .message(String.format(REFRESH_TOKEN_REVOKED, email))
                 .build();
     }
 
