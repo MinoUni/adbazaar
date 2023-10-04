@@ -6,6 +6,7 @@ import com.adbazaar.dto.authentication.LoginRequest;
 import com.adbazaar.dto.authentication.LoginResponse;
 import com.adbazaar.dto.authentication.RefreshTokenRequest;
 import com.adbazaar.dto.authentication.RegistrationRequest;
+import com.adbazaar.dto.authentication.RegistrationResponse;
 import com.adbazaar.dto.authentication.UserVerification;
 import com.adbazaar.security.JwtService;
 import com.adbazaar.service.UserService;
@@ -42,7 +43,7 @@ public class AuthenticationController {
             responses = {
                     @ApiResponse(responseCode = "201",
                             description = "User created",
-                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiResp.class))}),
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = RegistrationResponse.class))}),
                     @ApiResponse(responseCode = "409",
                             description = "User with provided email already created",
                             content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))}),
@@ -52,7 +53,7 @@ public class AuthenticationController {
             }
     )
     @PostMapping("/register")
-    public ResponseEntity<ApiResp> register(@Valid @RequestBody RegistrationRequest userDetails) {
+    public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody RegistrationRequest userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(userDetails));
     }
 
