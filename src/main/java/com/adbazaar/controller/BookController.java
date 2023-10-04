@@ -1,11 +1,11 @@
 package com.adbazaar.controller;
 
 import com.adbazaar.dto.ApiResp;
-import com.adbazaar.dto.product.CreateProductReq;
-import com.adbazaar.dto.product.ProductDetails;
-import com.adbazaar.dto.product.ProductShortDetails;
-import com.adbazaar.dto.product.ProductUpdate;
-import com.adbazaar.service.ProductService;
+import com.adbazaar.dto.book.BookUpdate;
+import com.adbazaar.dto.book.NewBook;
+import com.adbazaar.dto.book.BookDetails;
+import com.adbazaar.dto.book.BookShortDetails;
+import com.adbazaar.service.BookService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,37 +25,37 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor
-@Tag(name = "Products Management")
+@Tag(name = "Books Management")
 @RestController
-@RequestMapping("/products")
-public class ProductController {
+@RequestMapping("/books")
+public class BookController {
 
-    private final ProductService productService;
+    private final BookService bookService;
 
     @PostMapping
     public ResponseEntity<ApiResp> addNewProduct(@RequestHeader(AUTHORIZATION) String token,
-                                                 @RequestBody CreateProductReq productDetails) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(productDetails, token));
+                                                 @RequestBody NewBook productDetails) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.create(productDetails, token));
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProductShortDetails>> getAllProducts(Pageable pageable) {
-        return ResponseEntity.ok(productService.findAll(pageable));
+    public ResponseEntity<Page<BookShortDetails>> getAllProducts(Pageable pageable) {
+        return ResponseEntity.ok(bookService.findAll(pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDetails> getProductById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(productService.findById(id));
+    public ResponseEntity<BookDetails> getProductById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(bookService.findById(id));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResp> deleteById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(productService.deleteById(id));
+        return ResponseEntity.ok(bookService.deleteById(id));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResp> updateById(@PathVariable("id") Long id,
-                                              @RequestBody ProductUpdate details) {
-        return ResponseEntity.ok(productService.update(id, details));
+                                              @RequestBody BookUpdate details) {
+        return ResponseEntity.ok(bookService.update(id, details));
     }
 }

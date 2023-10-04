@@ -14,8 +14,8 @@ public class NewComment {
     @JsonProperty("user_id")
     private Long userId;
 
-    @JsonProperty("product_id")
-    private Long productId;
+    @JsonProperty("book_id")
+    private Long bookId;
 
     private Integer rate;
 

@@ -1,6 +1,6 @@
 package com.adbazaar.model;
 
-import com.adbazaar.dto.product.CreateProductReq;
+import com.adbazaar.dto.book.NewBook;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,8 +29,8 @@ import java.util.List;
 @Setter
 @ToString(exclude = {"seller", "comments"})
 @Entity
-@Table(name = "products")
-public class Product {
+@Table(name = "books")
+public class Book {
 
     @Id
     @GeneratedValue
@@ -72,11 +72,11 @@ public class Product {
     private AppUser seller;
 
     @Builder.Default
-    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "book", fetch = FetchType.EAGER)
     private List<Comment> comments = new ArrayList<>();
 
-    public static Product build(CreateProductReq details, AppUser user) {
-        return Product.builder()
+    public static Book build(NewBook details, AppUser user) {
+        return Book.builder()
                 .title(details.getTitle())
                 .author(details.getAuthor())
                 .genre(details.getGenre())

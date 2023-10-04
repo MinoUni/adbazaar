@@ -1,4 +1,4 @@
-package com.adbazaar.dto.product;
+package com.adbazaar.dto.book;
 
 import com.adbazaar.model.AppUser;
 import com.fasterxml.jackson.annotation.JsonFormat;
