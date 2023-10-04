@@ -2,7 +2,6 @@ package com.adbazaar.model;
 
 import com.adbazaar.dto.authentication.RegistrationRequest;
 import com.adbazaar.enums.Role;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,8 +10,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +31,7 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
-@ToString(exclude = {"verificationCode", "token", "products", "comments"})
+@ToString(exclude = {"books", "comments"})
 @Entity
 @Table(name = "users")
 public class AppUser implements UserDetails {
@@ -54,28 +51,23 @@ public class AppUser implements UserDetails {
     @Column(name = "birt_date", columnDefinition = "DATE")
     private LocalDate dateOfBirth;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role = Role.ROLE_USER;
 
+    @Builder.Default
     @Column(name = "verified")
-    private Boolean isVerified;
+    private Boolean isVerified = Boolean.FALSE;
 
+    @Builder.Default
     @Column(name = "creation_date", columnDefinition = "DATE")
-    private LocalDate creationDate;
+    private LocalDate creationDate = LocalDate.now();
 
     private String password;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    private VerificationCode verificationCode;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    private Token token;
-
     @Builder.Default
     @OneToMany(mappedBy = "seller", fetch = FetchType.EAGER)
-    private List<Product> products = new ArrayList<>();
+    private List<Book> books = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "author", fetch = FetchType.EAGER)
@@ -85,9 +77,7 @@ public class AppUser implements UserDetails {
         return AppUser.builder()
                 .fullName(userDetails.getFullName())
                 .email(userDetails.getEmail())
-                .role(Role.ROLE_USER)
-                .isVerified(Boolean.FALSE)
-                .creationDate(LocalDate.now())
+                .password(userDetails.getPassword())
                 .build();
     }
 
