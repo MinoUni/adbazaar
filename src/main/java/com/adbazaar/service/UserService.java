@@ -68,7 +68,8 @@ public class UserService {
         var user = AppUser.build(userDetails);
         var code = userVerifyTokenRepo.save(user.getEmail(), VerificationCode.build(user.getEmail()));
         userRepo.save(user);
-        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
+        System.out.println("==== CODE: " + code.getCode() + " ====");
+//        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
         return RegistrationResponse.builder().email(user.getEmail()).build();
     }
 
@@ -107,7 +108,7 @@ public class UserService {
             throw new AccountVerificationException(String.format(USER_ALREADY_VERIFIED, user.getEmail()));
         }
         var code = userVerifyTokenRepo.save(user.getEmail(), VerificationCode.build(user.getEmail()));
-        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
+//        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
         return ApiResp.build(HttpStatus.OK, String.format(USER_VERIFICATION_REASSIGNED, email));
     }
 
