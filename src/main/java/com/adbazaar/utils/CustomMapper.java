@@ -1,7 +1,7 @@
 package com.adbazaar.utils;
 
-import com.adbazaar.dto.product.ProductUpdate;
-import com.adbazaar.model.Product;
+import com.adbazaar.dto.book.BookUpdate;
+import com.adbazaar.model.Book;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,5 +14,5 @@ public interface CustomMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
-    void updateProduct(ProductUpdate updateDetails, @MappingTarget Product product);
+    void updateBook(BookUpdate updateDetails, @MappingTarget Book book);
 }

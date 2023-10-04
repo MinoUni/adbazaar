@@ -38,8 +38,8 @@ public class Comment {
     private AppUser author;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "book_id", nullable = false)
+    private Book book;
 
     @Builder.Default
     @Column(name = "creation_date")
@@ -58,10 +58,10 @@ public class Comment {
     @Builder.Default
     private Integer dislikes = 0;
 
-    public static Comment build(NewComment details, AppUser author, Product product) {
+    public static Comment build(NewComment details, AppUser author, Book book) {
         return Comment.builder()
                 .author(author)
-                .product(product)
+                .book(book)
                 .message(details.getMessage())
                 .rate(details.getRate())
                 .build();

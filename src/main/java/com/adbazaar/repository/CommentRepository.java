@@ -1,6 +1,6 @@
 package com.adbazaar.repository;
 
-import com.adbazaar.dto.comment.ProductComment;
+import com.adbazaar.dto.comment.BookComment;
 import com.adbazaar.dto.comment.UserComment;
 import com.adbazaar.model.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,22 +13,12 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @Query("""
-            select new com.adbazaar.dto.comment.ProductComment(c.id, p.id, u.fullName, c.creationDate, c.message, c.likes, c.dislikes)
-            from Comment c
-            inner join c.author u
-            inner join c.product p
-            where u.id = :id""")
-    List<ProductComment> findAllByUserId(@Param("id") Long id);
+    @Query("select new com.adbazaar.dto.comment.BookComment(c.id, b.id, u.fullName, c.creationDate, c.message, c.likes, c.dislikes) from Comment c inner join c.author u inner join c.book b where u.id = :id")
+    List<BookComment> findAllByUserId(@Param("id") Long id);
 
-    @Query("""
-            select new com.adbazaar.dto.comment.ProductComment(c.id, p.id, u.fullName, c.creationDate, c.message, c.likes, c.dislikes)
-            from Comment c
-            inner join c.author u
-            inner join c.product p
-            where p.id = :id""")
-    List<ProductComment> findAllByProductId(@Param("id") Long id);
+    @Query("select new com.adbazaar.dto.comment.BookComment(c.id, b.id, u.fullName, c.creationDate, c.message, c.likes, c.dislikes) from Comment c inner join c.author u inner join c.book b where b.id = :id")
+    List<BookComment> findAllByBookId(@Param("id") Long id);
 
-    @Query("select new com.adbazaar.dto.comment.UserComment(c.id, p.id, p.title, p.author, p.imagePath, c.creationDate, c.message) from Comment c inner join c.author u inner join c.product p where u.id = :id")
+    @Query("select new com.adbazaar.dto.comment.UserComment(c.id, c.creationDate, c.message, new com.adbazaar.dto.comment.BookInComment(b.id, b.title, b.author, b.imagePath)) from Comment c inner join c.author u inner join c.book b where u.id = :id")
     List<UserComment> findAllUserComments(@Param("id") Long id);
 }

@@ -1,13 +1,13 @@
 package com.adbazaar.service;
 
 import com.adbazaar.dto.ApiResp;
-import com.adbazaar.dto.comment.ProductComment;
+import com.adbazaar.dto.comment.BookComment;
 import com.adbazaar.dto.comment.NewComment;
-import com.adbazaar.exception.ProductNotFoundException;
+import com.adbazaar.exception.BookNotFoundException;
 import com.adbazaar.exception.UserNotFoundException;
 import com.adbazaar.model.Comment;
 import com.adbazaar.repository.CommentRepository;
-import com.adbazaar.repository.ProductRepository;
+import com.adbazaar.repository.BookRepository;
 import com.adbazaar.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,15 +20,17 @@ import java.util.List;
 public class CommentService {
 
     private final CommentRepository commentRepo;
+
     private final UserRepository userRepo;
-    private final ProductRepository productRepo;
+
+    private final BookRepository bookRepo;
 
     public ApiResp create(NewComment commentDetails) {
         var user = userRepo.findById(commentDetails.getUserId())
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with id {%d} not found", commentDetails.getUserId())));
-        var product = productRepo.findById(commentDetails.getProductId())
-                .orElseThrow(() -> new ProductNotFoundException(String.format("Product with id {%d} not found", commentDetails.getProductId())));
-        var comment = Comment.build(commentDetails, user, product);
+        var book = bookRepo.findById(commentDetails.getBookId())
+                .orElseThrow(() -> new BookNotFoundException(String.format("Book with id {%d} not found", commentDetails.getBookId())));
+        var comment = Comment.build(commentDetails, user, book);
         commentRepo.save(comment);
         return ApiResp.builder()
                 .status(HttpStatus.CREATED.value())
@@ -36,17 +38,17 @@ public class CommentService {
                 .build();
     }
 
-    public List<ProductComment> findCommentsByUserId(Long id) {
+    public List<BookComment> findCommentsByUserId(Long id) {
         if (!userRepo.existsById(id)) {
             throw new UserNotFoundException(String.format("User with id {%d} not found", id));
         }
         return commentRepo.findAllByUserId(id);
     }
 
-    public List<ProductComment> findCommentsByProductId(Long id) {
-        if (!productRepo.existsById(id)) {
-            throw new ProductNotFoundException(String.format("User with id {%d} not found", id));
+    public List<BookComment> findCommentsByProductId(Long id) {
+        if (!bookRepo.existsById(id)) {
+            throw new BookNotFoundException(String.format("User with id {%d} not found", id));
         }
-        return commentRepo.findAllByProductId(id);
+        return commentRepo.findAllByBookId(id);
     }
 }

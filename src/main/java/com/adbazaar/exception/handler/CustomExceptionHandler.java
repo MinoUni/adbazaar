@@ -3,7 +3,7 @@ package com.adbazaar.exception.handler;
 import com.adbazaar.dto.ApiError;
 import com.adbazaar.exception.AccessTokenException;
 import com.adbazaar.exception.AccountVerificationException;
-import com.adbazaar.exception.ProductNotFoundException;
+import com.adbazaar.exception.BookNotFoundException;
 import com.adbazaar.exception.RefreshTokenException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
@@ -31,8 +31,8 @@ import static java.util.stream.Collectors.toList;
 @RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<Object> handleProductNotFoundException(ProductNotFoundException e) {
+    @ExceptionHandler(BookNotFoundException.class)
+    public ResponseEntity<Object> handleBookNotFoundException(BookNotFoundException e) {
         return buildExceptionResponse(e, HttpStatus.NOT_FOUND, List.of());
     }
 
