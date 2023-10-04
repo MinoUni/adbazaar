@@ -19,7 +19,10 @@ spring:
         transport:
           protocol: smtp
   h2:
-    console.enabled: true
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
   jpa:
     database: h2
     hibernate:
