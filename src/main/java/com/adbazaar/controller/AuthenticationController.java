@@ -5,6 +5,7 @@ import com.adbazaar.dto.ApiResp;
 import com.adbazaar.dto.authentication.LoginRequest;
 import com.adbazaar.dto.authentication.LoginResponse;
 import com.adbazaar.dto.authentication.RefreshTokenRequest;
+import com.adbazaar.dto.authentication.RefreshTokenResp;
 import com.adbazaar.dto.authentication.RegistrationRequest;
 import com.adbazaar.dto.authentication.RegistrationResponse;
 import com.adbazaar.dto.authentication.UserVerification;
@@ -115,6 +116,26 @@ public class AuthenticationController {
     @PostMapping("verification/resend")
     public ResponseEntity<ApiResp> resendVerifyCode(@Valid @RequestParam String email) {
         return ResponseEntity.ok(userService.reassignVerificationCode(email));
+    }
+
+    @Operation(
+            summary = "Refresh user JWT keys",
+            description = "Refresh user JWT with new access & refresh token",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "User JWT pairs refreshed",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = RefreshTokenResp.class))}),
+                    @ApiResponse(responseCode = "404",
+                            description = "Token not found",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))}),
+                    @ApiResponse(responseCode = "400",
+                            description = "Validation failed",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))})
+            }
+    )
+    @PostMapping("token/refresh")
+    public ResponseEntity<RefreshTokenResp> refreshTokens(@RequestBody RefreshTokenRequest refreshToken) {
+        return ResponseEntity.ok(jwtService.refreshTokens(refreshToken));
     }
 
     @Operation(

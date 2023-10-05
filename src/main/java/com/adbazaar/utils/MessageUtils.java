@@ -18,9 +18,11 @@ public final class MessageUtils {
 
     public static final String USER_VERIFICATION_REASSIGNED = "Verification code reassigned for user: {%s}";
 
-    public static final String REFRESH_TOKEN_NOT_FOUND = "Token associated with user: {%s} not found";
+    public static final String REFRESH_TOKEN_NOT_FOUND = "JWT associated with user: {%s} not found";
 
-    public static final String REFRESH_TOKEN_INVALID_OR_EXPIRED = "Provided refresh token is invalid or expired";
+    public static final String REFRESH_TOKEN_INVALID_OR_EXPIRED = "Provided JWT is invalid or expired";
 
-    public static final String REFRESH_TOKEN_REVOKED = "Revoke refresh token for user: {%s}";
+    public static final String REFRESH_TOKEN_REVOKED = "Revoke JWT for user: {%s}";
+
+    public static final String INVALID_ACCESS_TOKEN = "Provided JWT is invalid or expired";
 }

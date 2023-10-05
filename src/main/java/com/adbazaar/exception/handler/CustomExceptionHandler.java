@@ -1,7 +1,7 @@
 package com.adbazaar.exception.handler;
 
 import com.adbazaar.dto.ApiError;
-import com.adbazaar.exception.AccessTokenException;
+import com.adbazaar.exception.JwtTokenException;
 import com.adbazaar.exception.AccountVerificationException;
 import com.adbazaar.exception.BookNotFoundException;
 import com.adbazaar.exception.RefreshTokenException;
@@ -51,8 +51,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildExceptionResponse(e, HttpStatus.BAD_REQUEST, List.of());
     }
 
-    @ExceptionHandler(AccessTokenException.class)
-    public ResponseEntity<Object> handleAccessTokenException(AccessTokenException e) {
+    @ExceptionHandler(JwtTokenException.class)
+    public ResponseEntity<Object> handleAccessTokenException(JwtTokenException e) {
         return buildExceptionResponse(e, HttpStatus.UNAUTHORIZED, List.of());
     }
 

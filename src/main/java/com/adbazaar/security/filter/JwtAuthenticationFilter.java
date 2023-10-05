@@ -1,6 +1,6 @@
 package com.adbazaar.security.filter;
 
-import com.adbazaar.exception.AccessTokenException;
+import com.adbazaar.exception.JwtTokenException;
 import com.adbazaar.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+
+import static com.adbazaar.utils.MessageUtils.INVALID_ACCESS_TOKEN;
 
 @RequiredArgsConstructor
 @Component
@@ -40,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = userDetailsService.loadUserByUsername(username);
             if (!jwtService.isAccessTokenValid(jwt, userDetails)) {
-                throw new AccessTokenException("Invalid/Outdated access token");
+                throw new JwtTokenException(INVALID_ACCESS_TOKEN);
             }
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
