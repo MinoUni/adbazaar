@@ -14,5 +14,6 @@ public interface CustomMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
+    @Mapping(target = "comments", ignore = true)
     void updateBook(BookUpdate updateDetails, @MappingTarget Book book);
 }
