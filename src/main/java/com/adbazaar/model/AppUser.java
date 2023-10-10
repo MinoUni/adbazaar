@@ -9,6 +9,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -24,14 +26,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-@ToString(exclude = {"books", "comments"})
+@ToString(exclude = {"books", "comments", "favoriteBooks"})
 @Entity
 @Table(name = "users")
 public class AppUser implements UserDetails {
@@ -45,6 +50,9 @@ public class AppUser implements UserDetails {
 
     @Column(unique = true)
     private String email;
+
+    @Column(name = "image_url")
+    private String imageUrl;
 
     private String phone;
 
@@ -72,6 +80,13 @@ public class AppUser implements UserDetails {
     @Builder.Default
     @OneToMany(mappedBy = "author", fetch = FetchType.EAGER)
     private List<Comment> comments = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany
+    @JoinTable(name = "book_favorite",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "book_id"))
+    private Set<Book> favoriteBooks = new HashSet<>();
 
     public static AppUser build(RegistrationRequest userDetails) {
         return AppUser.builder()
@@ -116,4 +131,18 @@ public class AppUser implements UserDetails {
         return true;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        AppUser appUser = (AppUser) object;
+        return Objects.equals(id, appUser.id) && Objects.equals(email, appUser.email) &&
+                Objects.equals(phone, appUser.phone) && Objects.equals(creationDate, appUser.creationDate) &&
+                Objects.equals(password, appUser.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, phone, creationDate, password);
+    }
 }

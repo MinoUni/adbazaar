@@ -1,6 +1,7 @@
 package com.adbazaar.controller;
 
 import com.adbazaar.dto.ApiError;
+import com.adbazaar.dto.ApiResp;
 import com.adbazaar.dto.user.UserDetails;
 import com.adbazaar.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,8 +12,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -47,5 +51,10 @@ public class UserController {
     @GetMapping("/token")
     public ResponseEntity<UserDetails> getUserByAccessToken(@RequestHeader(AUTHORIZATION) String token) {
         return ResponseEntity.ok(userService.findUserDetailsByAccessToken(token));
+    }
+
+    @PostMapping("/{id}/favorites")
+    public ResponseEntity<ApiResp> addBookToFavorites(@PathVariable("id") Long userId, @RequestParam("bookId") Long bookId) {
+        return ResponseEntity.ok(userService.addBookToFavorites(userId, bookId));
     }
 }

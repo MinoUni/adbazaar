@@ -10,6 +10,7 @@ import com.adbazaar.dto.book.UserBook;
 import com.adbazaar.dto.comment.UserComment;
 import com.adbazaar.dto.user.UserDetails;
 import com.adbazaar.exception.AccountVerificationException;
+import com.adbazaar.exception.BookNotFoundException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
 import com.adbazaar.model.AppUser;
@@ -19,6 +20,7 @@ import com.adbazaar.repository.CommentRepository;
 import com.adbazaar.repository.UserRepository;
 import com.adbazaar.repository.UserVerifyTokenRepository;
 import com.adbazaar.security.JwtService;
+import com.adbazaar.utils.CustomMapper;
 import com.adbazaar.utils.MailUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,15 +32,19 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
+import static com.adbazaar.utils.MessageUtils.BOOK_NOT_FOUND_BY_ID;
+import static com.adbazaar.utils.MessageUtils.USER_ADD_FAVORITES_OK;
 import static com.adbazaar.utils.MessageUtils.USER_ALREADY_EXIST;
 import static com.adbazaar.utils.MessageUtils.USER_ALREADY_VERIFIED;
 import static com.adbazaar.utils.MessageUtils.USER_NOT_FOUND_BY_EMAIL;
+import static com.adbazaar.utils.MessageUtils.USER_NOT_FOUND_BY_ID;
+import static com.adbazaar.utils.MessageUtils.USER_NOT_VERIFIED;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_CODE_EXPIRED;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_INVALID_CODE;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_REASSIGNED;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_SUCCESSFUL;
-import static com.adbazaar.utils.MessageUtils.VERIFICATION_MAIL_SUBJECT;
 
 @RequiredArgsConstructor
 @Service
@@ -60,6 +66,8 @@ public class UserService {
 
     private final MailUtils mailUtils;
 
+    private final CustomMapper mapper;
+
     public RegistrationResponse register(RegistrationRequest userDetails) {
         if (userRepo.existsByEmail(userDetails.getEmail())) {
             throw new UserAlreadyExistException(String.format(USER_ALREADY_EXIST, userDetails.getEmail()));
@@ -75,7 +83,7 @@ public class UserService {
 
     public LoginResponse login(LoginRequest userDetails) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDetails.getEmail(), userDetails.getPassword()));
-        var user = findUser(userDetails.getEmail());
+        var user = findUserByEmail(userDetails.getEmail());
         return LoginResponse.builder()
                 .fullName(user.getFullName())
                 .email(user.getEmail())
@@ -85,7 +93,7 @@ public class UserService {
     }
 
     public ApiResp verifyCode(UserVerification userDetails) {
-        var user = findUser(userDetails.getEmail());
+        var user = findUserByEmail(userDetails.getEmail());
         var code = userVerifyTokenRepo.findByEmail(user.getEmail());
         if (user.getIsVerified()) {
             throw new AccountVerificationException(String.format(USER_ALREADY_VERIFIED, user.getEmail()));
@@ -103,7 +111,7 @@ public class UserService {
     }
 
     public ApiResp reassignVerificationCode(String email) {
-        var user = findUser(email);
+        var user = findUserByEmail(email);
         if (user.getIsVerified()) {
             throw new AccountVerificationException(String.format(USER_ALREADY_VERIFIED, user.getEmail()));
         }
@@ -114,14 +122,33 @@ public class UserService {
 
     public UserDetails findUserDetailsByAccessToken(String token) {
         var email = jwtService.extractUsernameFromAccessToken(token.substring(7));
-        var user = findUser(email);
+        var user = findUserByEmail(email);
         List<UserBook> books = bookRepo.findAllUserBooks(user.getId());
         List<UserComment> comments = commentRepo.findAllUserComments(user.getId());
-        return UserDetails.build(user, books, comments);
+        Set<UserBook> favorites = mapper.booksToUserBooks(user.getFavoriteBooks());
+        return UserDetails.build(user, books, comments, favorites);
     }
 
-    private AppUser findUser(String email) {
+    public ApiResp addBookToFavorites(Long userId, Long bookId) {
+        var user = findUserById(userId);
+        if (!user.getIsVerified()) {
+            throw new AccountVerificationException(String.format(USER_NOT_VERIFIED, user.getEmail()));
+        }
+        var book = bookRepo.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException(String.format(BOOK_NOT_FOUND_BY_ID, bookId)));
+        var userFavoriteBooks = user.getFavoriteBooks();
+        userFavoriteBooks.add(book);
+        userRepo.save(user);
+        return ApiResp.build(HttpStatus.OK, String.format(USER_ADD_FAVORITES_OK, userId, bookId));
+    }
+
+    private AppUser findUserByEmail(String email) {
         return userRepo.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_EMAIL, email)));
+    }
+
+    private AppUser findUserById(Long id) {
+        return userRepo.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_ID, id)));
     }
 }

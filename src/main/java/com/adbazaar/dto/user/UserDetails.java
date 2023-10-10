@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -40,7 +42,7 @@ public class UserDetails {
     private List<String> orders = new ArrayList<>();
 
     @Builder.Default
-    private List<String> favorites = new ArrayList<>();
+    private Set<UserBook> favorites = new HashSet<>();
 
     @Builder.Default
     private List<UserComment> comments = new ArrayList<>();
@@ -48,7 +50,10 @@ public class UserDetails {
     @Builder.Default
     private List<UserBook> books = new ArrayList<>();
 
-    public static UserDetails build(AppUser user, List<UserBook> books, List<UserComment> comments) {
+    public static UserDetails build(AppUser user,
+                                    List<UserBook> books,
+                                    List<UserComment> comments,
+                                    Set<UserBook> favorites) {
         return UserDetails.builder()
                 .id(user.getId())
                 .isVerified(user.getIsVerified())
@@ -58,6 +63,7 @@ public class UserDetails {
                 .dateOfBirth(user.getDateOfBirth())
                 .comments(comments)
                 .books(books)
+                .favorites(favorites)
                 .build();
     }
 }

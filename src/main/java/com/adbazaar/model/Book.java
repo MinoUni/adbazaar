@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -20,14 +21,17 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-@ToString(exclude = {"seller", "comments"})
+@ToString(exclude = {"seller", "comments", "favorites"})
 @Entity
 @Table(name = "books")
 public class Book {
@@ -75,6 +79,10 @@ public class Book {
     @OneToMany(mappedBy = "book", fetch = FetchType.EAGER)
     private List<Comment> comments = new ArrayList<>();
 
+    @Builder.Default
+    @ManyToMany(mappedBy = "favoriteBooks")
+    private Set<AppUser> favorites = new HashSet<>();
+
     public static Book build(NewBook details, AppUser user) {
         return Book.builder()
                 .title(details.getTitle())
@@ -91,4 +99,19 @@ public class Book {
                 .build();
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Book book = (Book) object;
+        return Objects.equals(id, book.id) && Objects.equals(title, book.title) &&
+                Objects.equals(author, book.author) && Objects.equals(format, book.format) &&
+                Objects.equals(genre, book.genre) && Objects.equals(language, book.language) &&
+                Objects.equals(publishHouse, book.publishHouse);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, author, format, genre, language, publishHouse);
+    }
 }

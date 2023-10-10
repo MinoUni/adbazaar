@@ -26,33 +26,33 @@ import java.util.List;
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
     private final AuthenticationProvider authenticationProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
-        return http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(
-                                mvc.pattern("/authentication/**"),
-                                mvc.pattern("/v2/api-docs"),
-                                mvc.pattern("/v3/api-docs"),
-                                mvc.pattern("/v3/api-docs/**"),
-                                mvc.pattern("/swagger-resources"),
-                                mvc.pattern("/swagger-resources/**"),
-                                mvc.pattern("/configuration/ui"),
-                                mvc.pattern("/configuration/security"),
-                                mvc.pattern("/swagger-ui/**"),
-                                mvc.pattern("/webjars/**"),
-                                mvc.pattern("/swagger-ui.html"),
-                                PathRequest.toH2Console()).permitAll()
-                        .anyRequest().authenticated())
-                .authenticationProvider(authenticationProvider)
-                .build();
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(
+                        mvc.pattern("/authentication/**"),
+                        mvc.pattern("/v2/api-docs"),
+                        mvc.pattern("/v3/api-docs"),
+                        mvc.pattern("/v3/api-docs/**"),
+                        mvc.pattern("/swagger-resources"),
+                        mvc.pattern("/swagger-resources/**"),
+                        mvc.pattern("/configuration/ui"),
+                        mvc.pattern("/configuration/security"),
+                        mvc.pattern("/swagger-ui/**"),
+                        mvc.pattern("/webjars/**"),
+                        mvc.pattern("/swagger-ui.html"),
+                        PathRequest.toH2Console()).permitAll()
+                .anyRequest().authenticated());
+        http.authenticationProvider(authenticationProvider);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 
     @Bean

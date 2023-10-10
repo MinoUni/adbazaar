@@ -52,7 +52,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(JwtTokenException.class)
-    public ResponseEntity<Object> handleAccessTokenException(JwtTokenException e) {
+    public ResponseEntity<Object> handleJwtTokenException(JwtTokenException e) {
         return buildExceptionResponse(e, HttpStatus.UNAUTHORIZED, List.of());
     }
 
