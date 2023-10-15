@@ -6,6 +6,7 @@ import com.adbazaar.dto.authentication.LoginResponse;
 import com.adbazaar.dto.authentication.RegistrationRequest;
 import com.adbazaar.dto.authentication.RegistrationResponse;
 import com.adbazaar.dto.authentication.UserVerification;
+import com.adbazaar.dto.book.NewBook;
 import com.adbazaar.dto.book.UserBook;
 import com.adbazaar.dto.comment.UserComment;
 import com.adbazaar.dto.user.UserDetails;
@@ -14,6 +15,7 @@ import com.adbazaar.exception.BookNotFoundException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
 import com.adbazaar.model.AppUser;
+import com.adbazaar.model.Book;
 import com.adbazaar.model.VerificationCode;
 import com.adbazaar.repository.BookRepository;
 import com.adbazaar.repository.CommentRepository;
@@ -34,8 +36,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.adbazaar.utils.MessageUtils.BOOK_CREATED;
 import static com.adbazaar.utils.MessageUtils.BOOK_NOT_FOUND_BY_ID;
-import static com.adbazaar.utils.MessageUtils.USER_ADD_FAVORITES_OK;
+import static com.adbazaar.utils.MessageUtils.USER_ADD_TO_FAVORITES_OK;
 import static com.adbazaar.utils.MessageUtils.USER_ALREADY_EXIST;
 import static com.adbazaar.utils.MessageUtils.USER_ALREADY_VERIFIED;
 import static com.adbazaar.utils.MessageUtils.USER_NOT_FOUND_BY_EMAIL;
@@ -68,7 +71,7 @@ public class UserService {
 
     private final CustomMapper mapper;
 
-    public RegistrationResponse register(RegistrationRequest userDetails) {
+    public RegistrationResponse createUser(RegistrationRequest userDetails) {
         if (userRepo.existsByEmail(userDetails.getEmail())) {
             throw new UserAlreadyExistException(String.format(USER_ALREADY_EXIST, userDetails.getEmail()));
         }
@@ -120,13 +123,20 @@ public class UserService {
         return ApiResp.build(HttpStatus.OK, String.format(USER_VERIFICATION_REASSIGNED, email));
     }
 
-    public UserDetails findUserDetailsByAccessToken(String token) {
+    public UserDetails findUserDetailsByJwt(String token) {
         var email = jwtService.extractUsernameFromAccessToken(token.substring(7));
         var user = findUserByEmail(email);
         List<UserBook> books = bookRepo.findAllUserBooks(user.getId());
         List<UserComment> comments = commentRepo.findAllUserComments(user.getId());
         Set<UserBook> favorites = mapper.booksToUserBooks(user.getFavoriteBooks());
         return UserDetails.build(user, books, comments, favorites);
+    }
+
+    public ApiResp createBook(Long userId, NewBook productDetails) {
+        var user = findUserById(userId);
+        var book = Book.build(productDetails, user);
+        bookRepo.save(book);
+        return ApiResp.build(HttpStatus.CREATED, String.format(BOOK_CREATED, userId));
     }
 
     public ApiResp addBookToFavorites(Long userId, Long bookId) {
@@ -139,7 +149,7 @@ public class UserService {
         var userFavoriteBooks = user.getFavoriteBooks();
         userFavoriteBooks.add(book);
         userRepo.save(user);
-        return ApiResp.build(HttpStatus.OK, String.format(USER_ADD_FAVORITES_OK, userId, bookId));
+        return ApiResp.build(HttpStatus.OK, String.format(USER_ADD_TO_FAVORITES_OK, userId, bookId));
     }
 
     private AppUser findUserByEmail(String email) {

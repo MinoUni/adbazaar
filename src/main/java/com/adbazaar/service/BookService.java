@@ -1,16 +1,11 @@
 package com.adbazaar.service;
 
 import com.adbazaar.dto.ApiResp;
-import com.adbazaar.dto.book.NewBook;
 import com.adbazaar.dto.book.BookDetails;
 import com.adbazaar.dto.book.BookShortDetails;
 import com.adbazaar.dto.book.BookUpdate;
 import com.adbazaar.exception.BookNotFoundException;
-import com.adbazaar.exception.UserNotFoundException;
-import com.adbazaar.model.Book;
 import com.adbazaar.repository.BookRepository;
-import com.adbazaar.repository.UserRepository;
-import com.adbazaar.security.JwtService;
 import com.adbazaar.utils.CustomMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,23 +20,7 @@ public class BookService {
 
     private final BookRepository bookRepo;
 
-    private final UserRepository userRepo;
-
     private final CustomMapper mapper;
-
-    private final JwtService jwtService;
-
-    public ApiResp create(NewBook productDetails, String token) {
-        var email = jwtService.extractUsernameFromAccessToken(token.substring(7));
-        var user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User with email {%s} not found", email)));
-        var book = Book.build(productDetails, user);
-        bookRepo.save(book);
-        return ApiResp.builder()
-                .status(HttpStatus.CREATED.value())
-                .message("User %s add a new book")
-                .build();
-    }
 
     @Transactional(readOnly = true)
     public BookDetails findById(Long id) {

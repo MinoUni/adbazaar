@@ -22,15 +22,20 @@ public final class MessageUtils {
 
     public static final String USER_VERIFICATION_REASSIGNED = "Verification code reassigned for user: {%s}";
 
-    public static final String USER_ADD_FAVORITES_OK = "User with id: {%d} add to favorites Book with id: {%d}";
+    public static final String USER_ADD_TO_FAVORITES_OK = "User with id: {%d} add to favorites Book with id: {%d}";
 
-    public static final String REFRESH_TOKEN_NOT_FOUND = "JWT associated with user: {%s} not found";
 
-    public static final String REFRESH_TOKEN_INVALID_OR_EXPIRED = "Provided JWT is invalid or expired";
+    public static final String REFRESH_TOKEN_NOT_FOUND = "JWT refresh associated with user: {%s} not found";
 
-    public static final String REFRESH_TOKEN_REVOKED = "Revoke JWT for user: {%s}";
+    public static final String REFRESH_TOKEN_INVALID_OR_EXPIRED = "Provided refresh JWT is invalid or expired";
 
-    public static final String INVALID_ACCESS_TOKEN = "Provided JWT is invalid or expired";
+    public static final String REFRESH_TOKEN_REVOKED = "Revoke refresh JWT for user: {%s}";
+
+    public static final String INVALID_JWT = "Provided JWT is invalid";
+
+    public static final String EXPIRED_JWT = "Provided JWT is expired";
+
+    public static final String BOOK_CREATED = "User with id {%d} create a new book";
 
     public static final String BOOK_NOT_FOUND_BY_ID = "Book with id: {%d} not found";
 

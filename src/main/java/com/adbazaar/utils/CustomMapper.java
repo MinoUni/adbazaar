@@ -18,6 +18,7 @@ public interface CustomMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
     @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "favorites", ignore = true)
     void updateBook(BookUpdate updateDetails, @MappingTarget Book book);
 
     Set<UserBook> booksToUserBooks(Set<Book> userFavoriteBooks);
