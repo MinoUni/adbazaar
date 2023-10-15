@@ -29,6 +29,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.function.Function;
 
+import static com.adbazaar.utils.MessageUtils.EXPIRED_JWT;
+import static com.adbazaar.utils.MessageUtils.INVALID_JWT;
 import static com.adbazaar.utils.MessageUtils.REFRESH_TOKEN_INVALID_OR_EXPIRED;
 import static com.adbazaar.utils.MessageUtils.REFRESH_TOKEN_NOT_FOUND;
 import static com.adbazaar.utils.MessageUtils.REFRESH_TOKEN_REVOKED;
@@ -136,14 +138,16 @@ public class JwtService {
 
     private Claims extractClaims(String token, String secret) {
         try {
-            return Jwts
-                    .parserBuilder()
+            return Jwts.parserBuilder()
                     .setSigningKey(getSignInKey(secret))
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException |
-                 SignatureException | IllegalArgumentException e) {
+        } catch (ExpiredJwtException e) {
+            throw new JwtTokenException(EXPIRED_JWT);
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
+            throw new JwtTokenException(INVALID_JWT);
+        } catch (IllegalArgumentException e) {
             throw new JwtTokenException(e.getMessage());
         }
     }

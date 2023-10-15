@@ -58,7 +58,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RefreshTokenException.class)
     public ResponseEntity<Object> handleRefreshTokenException(RefreshTokenException e) {
-        return buildExceptionResponse(e, HttpStatus.NOT_FOUND, List.of());
+        return buildExceptionResponse(e, HttpStatus.BAD_REQUEST, List.of());
     }
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -67,13 +67,18 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(UserAlreadyExistException.class)
-    public final ResponseEntity<Object> handleUserAlreadyExistException(UserAlreadyExistException e) {
+    public ResponseEntity<Object> handleUserAlreadyExistException(UserAlreadyExistException e) {
         return buildExceptionResponse(e, HttpStatus.CONFLICT, List.of());
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public final ResponseEntity<Object> handleAuthenticationException(AuthenticationException e) {
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException e) {
         return buildExceptionResponse(e, HttpStatus.UNAUTHORIZED, List.of());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleOtherExceptions(Exception e) {
+        return buildExceptionResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, List.of());
     }
 
     private ResponseEntity<Object> buildExceptionResponse(Exception exception, HttpStatusCode httpStatus, List<String> details) {
