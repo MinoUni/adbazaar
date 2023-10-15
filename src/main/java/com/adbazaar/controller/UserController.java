@@ -101,4 +101,27 @@ public class UserController {
                                                       @RequestParam("bookId") Long bookId) {
         return ResponseEntity.ok(userService.addBookToFavorites(userId, bookId));
     }
+
+    @Operation(
+            summary = "Add a book into orders list",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "User add book to his orders list",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiResp.class))}),
+                    @ApiResponse(responseCode = "401",
+                            description = "Unauthorized",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))}),
+                    @ApiResponse(responseCode = "404",
+                            description = "User/Book not found",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))}),
+                    @ApiResponse(responseCode = "400",
+                            description = "Validation failed",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))})
+            }
+    )
+    @PostMapping("/{id}/orders")
+    public ResponseEntity<ApiResp> addBookToOrders(@PathVariable("id") Long userId,
+                                                   @RequestParam("bookId") Long bookId) {
+        return ResponseEntity.ok(userService.addBookToOrders(userId, bookId));
+    }
 }

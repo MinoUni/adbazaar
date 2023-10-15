@@ -11,6 +11,7 @@ import com.adbazaar.dto.book.UserBook;
 import com.adbazaar.dto.comment.UserComment;
 import com.adbazaar.dto.user.UserDetails;
 import com.adbazaar.exception.AccountVerificationException;
+import com.adbazaar.exception.BookException;
 import com.adbazaar.exception.BookNotFoundException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
@@ -36,9 +37,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.adbazaar.utils.MessageUtils.BOOK_ALREADY_IN_FAVORITES;
+import static com.adbazaar.utils.MessageUtils.BOOK_ALREADY_IN_ORDERS;
 import static com.adbazaar.utils.MessageUtils.BOOK_CREATED;
 import static com.adbazaar.utils.MessageUtils.BOOK_NOT_FOUND_BY_ID;
 import static com.adbazaar.utils.MessageUtils.USER_ADD_TO_FAVORITES_OK;
+import static com.adbazaar.utils.MessageUtils.USER_ADD_TO_ORDERS_OK;
 import static com.adbazaar.utils.MessageUtils.USER_ALREADY_EXIST;
 import static com.adbazaar.utils.MessageUtils.USER_ALREADY_VERIFIED;
 import static com.adbazaar.utils.MessageUtils.USER_NOT_FOUND_BY_EMAIL;
@@ -129,7 +133,8 @@ public class UserService {
         List<UserBook> books = bookRepo.findAllUserBooks(user.getId());
         List<UserComment> comments = commentRepo.findAllUserComments(user.getId());
         Set<UserBook> favorites = mapper.booksToUserBooks(user.getFavoriteBooks());
-        return UserDetails.build(user, books, comments, favorites);
+        Set<UserBook> orders = mapper.booksToUserBooks(user.getOrders());
+        return UserDetails.build(user, books, comments, favorites, orders);
     }
 
     public ApiResp createBook(Long userId, NewBook productDetails) {
@@ -140,16 +145,40 @@ public class UserService {
     }
 
     public ApiResp addBookToFavorites(Long userId, Long bookId) {
+        var user = checkIsUserVerified(userId);
+        var book = findBookById(bookId);
+        var userFavoriteBooks = user.getFavoriteBooks();
+        if (userFavoriteBooks.contains(book)) {
+            throw new BookException(String.format(BOOK_ALREADY_IN_FAVORITES, bookId, userId));
+        }
+        userFavoriteBooks.add(book);
+        userRepo.save(user);
+        return ApiResp.build(HttpStatus.OK, String.format(USER_ADD_TO_FAVORITES_OK, userId, bookId));
+    }
+
+    public ApiResp addBookToOrders(Long userId, Long bookId) {
+        var user = checkIsUserVerified(userId);
+        var book = findBookById(bookId);
+        var userOrders = user.getOrders();
+        if (userOrders.contains(book)) {
+            throw new BookException(String.format(BOOK_ALREADY_IN_ORDERS, bookId, userId));
+        }
+        userOrders.add(book);
+        userRepo.save(user);
+        return ApiResp.build(HttpStatus.OK, String.format(USER_ADD_TO_ORDERS_OK, userId, bookId));
+    }
+
+    private AppUser checkIsUserVerified(Long userId) {
         var user = findUserById(userId);
         if (!user.getIsVerified()) {
             throw new AccountVerificationException(String.format(USER_NOT_VERIFIED, user.getEmail()));
         }
-        var book = bookRepo.findById(bookId)
+        return user;
+    }
+
+    private Book findBookById(Long bookId) {
+        return bookRepo.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(String.format(BOOK_NOT_FOUND_BY_ID, bookId)));
-        var userFavoriteBooks = user.getFavoriteBooks();
-        userFavoriteBooks.add(book);
-        userRepo.save(user);
-        return ApiResp.build(HttpStatus.OK, String.format(USER_ADD_TO_FAVORITES_OK, userId, bookId));
     }
 
     private AppUser findUserByEmail(String email) {

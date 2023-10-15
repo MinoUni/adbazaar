@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -36,7 +37,7 @@ import java.util.Set;
 @Builder
 @Getter
 @Setter
-@ToString(exclude = {"books", "comments", "favoriteBooks"})
+@ToString(exclude = {"books", "comments", "favoriteBooks", "orders"})
 @Entity
 @Table(name = "users")
 public class AppUser implements UserDetails {
@@ -82,11 +83,18 @@ public class AppUser implements UserDetails {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany
-    @JoinTable(name = "book_favorite",
+    @ManyToMany
+    @JoinTable(name = "users_favorites",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "book_id"))
     private Set<Book> favoriteBooks = new HashSet<>();
+
+    @Builder.Default
+    @ManyToMany
+    @JoinTable(name = "users_orders",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "book_id", referencedColumnName = "id"))
+    private Set<Book> orders = new HashSet<>();
 
     public static AppUser build(RegistrationRequest userDetails) {
         return AppUser.builder()

@@ -31,7 +31,7 @@ import java.util.Set;
 @Builder
 @Getter
 @Setter
-@ToString(exclude = {"seller", "comments", "favorites"})
+@ToString(exclude = {"seller", "comments", "favorites", "buyers"})
 @Entity
 @Table(name = "books")
 public class Book {
@@ -82,6 +82,10 @@ public class Book {
     @Builder.Default
     @ManyToMany(mappedBy = "favoriteBooks")
     private Set<AppUser> favorites = new HashSet<>();
+
+    @Builder.Default
+    @ManyToMany(mappedBy = "orders")
+    private Set<AppUser> buyers = new HashSet<>();
 
     public static Book build(NewBook details, AppUser user) {
         return Book.builder()

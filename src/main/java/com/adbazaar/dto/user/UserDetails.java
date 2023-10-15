@@ -39,7 +39,7 @@ public class UserDetails {
     private LocalDate dateOfBirth;
 
     @Builder.Default
-    private List<String> orders = new ArrayList<>();
+    private Set<UserBook> orders = new HashSet<>();
 
     @Builder.Default
     private Set<UserBook> favorites = new HashSet<>();
@@ -53,7 +53,8 @@ public class UserDetails {
     public static UserDetails build(AppUser user,
                                     List<UserBook> books,
                                     List<UserComment> comments,
-                                    Set<UserBook> favorites) {
+                                    Set<UserBook> favorites,
+                                    Set<UserBook> orders) {
         return UserDetails.builder()
                 .id(user.getId())
                 .isVerified(user.getIsVerified())
@@ -64,6 +65,7 @@ public class UserDetails {
                 .comments(comments)
                 .books(books)
                 .favorites(favorites)
+                .orders(orders)
                 .build();
     }
 }

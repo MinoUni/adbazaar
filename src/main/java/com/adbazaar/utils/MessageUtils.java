@@ -24,6 +24,7 @@ public final class MessageUtils {
 
     public static final String USER_ADD_TO_FAVORITES_OK = "User with id: {%d} add to favorites Book with id: {%d}";
 
+    public static final String USER_ADD_TO_ORDERS_OK = "User with id: {%d} add to orders Book with id: {%d}";
 
     public static final String REFRESH_TOKEN_NOT_FOUND = "JWT refresh associated with user: {%s} not found";
 
@@ -39,4 +40,7 @@ public final class MessageUtils {
 
     public static final String BOOK_NOT_FOUND_BY_ID = "Book with id: {%d} not found";
 
+    public static final String BOOK_ALREADY_IN_FAVORITES = "Book with id: {%d} already in favorite list of user with id: {%d}";
+
+    public static final String BOOK_ALREADY_IN_ORDERS = "Book with id: {%d} already in orders list of user with id: {%d}";
 }

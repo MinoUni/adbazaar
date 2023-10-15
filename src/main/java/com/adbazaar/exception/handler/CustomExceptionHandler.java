@@ -1,9 +1,10 @@
 package com.adbazaar.exception.handler;
 
 import com.adbazaar.dto.ApiError;
-import com.adbazaar.exception.JwtTokenException;
 import com.adbazaar.exception.AccountVerificationException;
+import com.adbazaar.exception.BookException;
 import com.adbazaar.exception.BookNotFoundException;
+import com.adbazaar.exception.JwtTokenException;
 import com.adbazaar.exception.RefreshTokenException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
@@ -79,6 +80,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleOtherExceptions(Exception e) {
         return buildExceptionResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, List.of());
+    }
+
+    @ExceptionHandler(BookException.class)
+    public ResponseEntity<Object> handleBookException(BookException e) {
+        return buildExceptionResponse(e, HttpStatus.CONFLICT, List.of());
     }
 
     private ResponseEntity<Object> buildExceptionResponse(Exception exception, HttpStatusCode httpStatus, List<String> details) {
