@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
         ),
         servers = {
                 @Server(url = "http://localhost:8080", description = "Local dev ENV"),
-                @Server(url = "http://13.40.103.28:8080", description = "Amazon vm ENV")
+                @Server(url = "https://adbazaar-spring-backend.onrender.com", description = "Render prod ENV")
         },
         security = {@SecurityRequirement(name = "bearerAuth")}
 )
@@ -34,5 +34,4 @@ import org.springframework.context.annotation.Configuration;
                         type = SecuritySchemeType.HTTP, bearerFormat = "JWT", in = SecuritySchemeIn.HEADER)
         }
 )
-public class OpenApiConfiguration {
-}
+public class OpenApiConfiguration {}
