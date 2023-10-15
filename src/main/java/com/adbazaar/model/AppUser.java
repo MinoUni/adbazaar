@@ -56,7 +56,7 @@ public class AppUser implements UserDetails {
 
     private String phone;
 
-    @Column(name = "birt_date", columnDefinition = "DATE")
+    @Column(name = "birth_date", columnDefinition = "DATE")
     private LocalDate dateOfBirth;
 
     @Builder.Default

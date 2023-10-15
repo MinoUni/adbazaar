@@ -4,6 +4,20 @@ logging:
     root: INFO
 # SPRING
 spring:
+  sql:
+    init:
+      mode: always
+#  SECURITY
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
   # MAIL SENDER
   mail:
     host: smtp.gmail.com
@@ -25,6 +39,7 @@ spring:
         web-allow-others: true
   jpa:
     database: h2
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: create-drop
     properties:
