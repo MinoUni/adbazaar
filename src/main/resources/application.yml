@@ -38,7 +38,7 @@ spring:
       settings:
         web-allow-others: true
   jpa:
-    show-sql: true
+    show-sql: false
     database: h2
     defer-datasource-initialization: true
     hibernate:
