@@ -24,6 +24,8 @@ public class BookShortDetails {
 
     private String author;
 
+    private String genre;
+
     private String format;
 
     private BigDecimal rate;
@@ -38,6 +40,7 @@ public class BookShortDetails {
                 .imagePath(book.getImagePath())
                 .title(book.getTitle())
                 .author(book.getAuthor())
+                .genre(book.getGenre())
                 .format(book.getFormat())
                 .rate(book.getRate())
                 .quantity(book.getQuantity())
