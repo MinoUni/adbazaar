@@ -28,7 +28,7 @@ INSERT INTO books(user_id, title, author, format, rate, quantity, price, genre, 
 'https://res.cloudinary.com/dn4dxdwur/image/upload/v1697100692/books/ncywjjo9fayymkyxx3dv.jpg',
 'In their youth, Florentino Ariza and Fermina Daza fall passionately in love. When Fermina eventually chooses to marry a wealthy, well-born doctor, Florentino is devastated, but he is a romantic. As he rises in his business career he whiles away the years in 622 affairs--yet he reserves his heart for Fermina. Her husband dies at last, and Florentino purposefully attends the funeral. Fifty years, nine months, and four days after he first declared his love for Fermina, he will do so again.'),
 
-(1, 'American Prometheus: The Inspiration', 'Kai Bird, Martin J. Sherwin', 'paper', 0.0, 1, 14.35 ,'fiction', 'en', 'Orbit',
+(1, 'American Prometheus: The Inspiration', 'Kai Bird, Martin J. Sherwin', 'paper', 0.0, 1, 14.35, 'fiction', 'en', 'Orbit',
 'https://res.cloudinary.com/dn4dxdwur/image/upload/v1697100693/books/odupjdktfl1juxnrniab.jpg',
 'In this magisterial, acclaimed biography twenty-five years in the making, Kai Bird and Martin Sherwin capture Oppenheimer’s life and times, from his early career to his central role in the Cold War. This is biography and history at its finest, riveting and deeply informative.'),
 

@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         final var authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ") || request.getServletPath().matches("/authentication/\\w*")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ") || isFromWhitelistPath(request.getServletPath())) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -60,5 +60,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (UsernameNotFoundException | JwtTokenException e) {
             resolver.resolveException(request, response, null, e);
         }
+    }
+
+    private boolean isFromWhitelistPath(String path) {
+        return path.matches("/authentication/\\w*") || path.matches("^/books/?\\w*");
     }
 }

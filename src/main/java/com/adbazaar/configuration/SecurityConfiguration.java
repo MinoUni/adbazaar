@@ -38,6 +38,7 @@ public class SecurityConfiguration {
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(
                         mvc.pattern("/authentication/**"),
+                        mvc.pattern("/books/**"),
                         mvc.pattern("/v2/api-docs"),
                         mvc.pattern("/v3/api-docs"),
                         mvc.pattern("/v3/api-docs/**"),
