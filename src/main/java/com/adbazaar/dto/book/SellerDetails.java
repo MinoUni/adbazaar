@@ -16,6 +16,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class SellerDetails {
 
+    private Long id;
+
     @JsonProperty("full_name")
     private String fullName;
 
@@ -29,6 +31,7 @@ public class SellerDetails {
 
     public static SellerDetails build(AppUser user) {
         return SellerDetails.builder()
+                .id(user.getId())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .phone(user.getPhone())

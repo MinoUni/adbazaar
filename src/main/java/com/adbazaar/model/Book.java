@@ -3,7 +3,6 @@ package com.adbazaar.model;
 import com.adbazaar.dto.book.NewBook;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -77,7 +76,7 @@ public class Book {
     private AppUser seller;
 
     @Builder.Default
-    @OneToMany(mappedBy = "book", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "book")
     private List<Comment> comments = new ArrayList<>();
 
     @Builder.Default

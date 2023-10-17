@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -17,9 +18,6 @@ public class BookComment {
 
     private Long id;
 
-    @JsonProperty("product_id")
-    private Long productId;
-
     private String author;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ssa")
@@ -27,6 +25,8 @@ public class BookComment {
     private LocalDateTime creationDate;
 
     private String message;
+
+    private BigDecimal rate;
 
     private Integer likes;
 

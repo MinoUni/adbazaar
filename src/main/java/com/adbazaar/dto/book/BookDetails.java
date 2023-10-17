@@ -1,16 +1,16 @@
 package com.adbazaar.dto.book;
 
-import com.adbazaar.model.Book;
+import com.adbazaar.dto.comment.BookComment;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookDetails {
@@ -43,21 +43,21 @@ public class BookDetails {
 
     private SellerDetails seller;
 
-    public static BookDetails build(Book book) {
-        return BookDetails.builder()
-                .id(book.getId())
-                .title(book.getTitle())
-                .author(book.getAuthor())
-                .description(book.getDescription())
-                .imagePath(book.getImagePath())
-                .format(book.getFormat())
-                .price(book.getPrice())
-                .rate(book.getRate())
-                .quantity(book.getQuantity())
-                .genre(book.getGenre())
-                .publishHouse(book.getPublishHouse())
-                .language(book.getLanguage())
-                .seller(SellerDetails.build(book.getSeller()))
-                .build();
+    private List<BookComment> comments = new ArrayList<>();
+
+    public BookDetails(Long id, String title, String author, String description, String imagePath, String format, BigDecimal rate, Integer quantity, BigDecimal price, String genre, String publishHouse, String language, SellerDetails seller) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.description = description;
+        this.imagePath = imagePath;
+        this.format = format;
+        this.rate = rate;
+        this.quantity = quantity;
+        this.price = price;
+        this.genre = genre;
+        this.publishHouse = publishHouse;
+        this.language = language;
+        this.seller = seller;
     }
 }
