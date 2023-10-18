@@ -1,6 +1,5 @@
 package com.adbazaar.dto.book;
 
-import com.adbazaar.model.AppUser;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -29,13 +28,4 @@ public class SellerDetails {
     @JsonProperty("creation_date")
     private LocalDate creationDate;
 
-    public static SellerDetails build(AppUser user) {
-        return SellerDetails.builder()
-                .id(user.getId())
-                .fullName(user.getFullName())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .creationDate(user.getCreationDate())
-                .build();
-    }
 }

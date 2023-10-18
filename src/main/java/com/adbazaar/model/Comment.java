@@ -30,7 +30,6 @@ public class Comment {
 
     @Id
     @GeneratedValue
-    @Column(updatable = false, nullable = false)
     private Long id;
 
     @ManyToOne

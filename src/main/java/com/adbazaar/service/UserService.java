@@ -6,17 +6,13 @@ import com.adbazaar.dto.authentication.LoginResponse;
 import com.adbazaar.dto.authentication.RegistrationRequest;
 import com.adbazaar.dto.authentication.RegistrationResponse;
 import com.adbazaar.dto.authentication.UserVerification;
-import com.adbazaar.dto.book.NewBook;
 import com.adbazaar.dto.book.UserBook;
 import com.adbazaar.dto.comment.UserComment;
 import com.adbazaar.dto.user.UserDetails;
 import com.adbazaar.exception.AccountVerificationException;
-import com.adbazaar.exception.BookException;
-import com.adbazaar.exception.BookNotFoundException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
 import com.adbazaar.model.AppUser;
-import com.adbazaar.model.Book;
 import com.adbazaar.model.VerificationCode;
 import com.adbazaar.repository.BookRepository;
 import com.adbazaar.repository.CommentRepository;
@@ -37,17 +33,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.adbazaar.utils.MessageUtils.BOOK_ALREADY_IN_FAVORITES;
-import static com.adbazaar.utils.MessageUtils.BOOK_ALREADY_IN_ORDERS;
-import static com.adbazaar.utils.MessageUtils.BOOK_CREATED;
-import static com.adbazaar.utils.MessageUtils.BOOK_NOT_FOUND_BY_ID;
-import static com.adbazaar.utils.MessageUtils.USER_ADD_TO_FAVORITES_OK;
-import static com.adbazaar.utils.MessageUtils.USER_ADD_TO_ORDERS_OK;
 import static com.adbazaar.utils.MessageUtils.USER_ALREADY_EXIST;
 import static com.adbazaar.utils.MessageUtils.USER_ALREADY_VERIFIED;
 import static com.adbazaar.utils.MessageUtils.USER_NOT_FOUND_BY_EMAIL;
-import static com.adbazaar.utils.MessageUtils.USER_NOT_FOUND_BY_ID;
-import static com.adbazaar.utils.MessageUtils.USER_NOT_VERIFIED;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_CODE_EXPIRED;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_INVALID_CODE;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_REASSIGNED;
@@ -123,6 +111,7 @@ public class UserService {
             throw new AccountVerificationException(String.format(USER_ALREADY_VERIFIED, user.getEmail()));
         }
         var code = userVerifyTokenRepo.save(user.getEmail(), VerificationCode.build(user.getEmail()));
+        System.out.println("==== REASSIGN CODE: " + code.getCode() + " ====");
 //        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
         return ApiResp.build(HttpStatus.OK, String.format(USER_VERIFICATION_REASSIGNED, email));
     }
@@ -137,57 +126,10 @@ public class UserService {
         return UserDetails.build(user, books, comments, favorites, orders);
     }
 
-    public ApiResp createBook(Long userId, NewBook productDetails) {
-        var user = findUserById(userId);
-        var book = Book.build(productDetails, user);
-        bookRepo.save(book);
-        return ApiResp.build(HttpStatus.CREATED, String.format(BOOK_CREATED, userId));
-    }
-
-    public ApiResp addBookToFavorites(Long userId, Long bookId) {
-        var user = checkIsUserVerified(userId);
-        var book = findBookById(bookId);
-        var userFavoriteBooks = user.getFavoriteBooks();
-        if (userFavoriteBooks.contains(book)) {
-            throw new BookException(String.format(BOOK_ALREADY_IN_FAVORITES, bookId, userId));
-        }
-        userFavoriteBooks.add(book);
-        userRepo.save(user);
-        return ApiResp.build(HttpStatus.OK, String.format(USER_ADD_TO_FAVORITES_OK, userId, bookId));
-    }
-
-    public ApiResp addBookToOrders(Long userId, Long bookId) {
-        var user = checkIsUserVerified(userId);
-        var book = findBookById(bookId);
-        var userOrders = user.getOrders();
-        if (userOrders.contains(book)) {
-            throw new BookException(String.format(BOOK_ALREADY_IN_ORDERS, bookId, userId));
-        }
-        userOrders.add(book);
-        userRepo.save(user);
-        return ApiResp.build(HttpStatus.OK, String.format(USER_ADD_TO_ORDERS_OK, userId, bookId));
-    }
-
-    private AppUser checkIsUserVerified(Long userId) {
-        var user = findUserById(userId);
-        if (!user.getIsVerified()) {
-            throw new AccountVerificationException(String.format(USER_NOT_VERIFIED, user.getEmail()));
-        }
-        return user;
-    }
-
-    private Book findBookById(Long bookId) {
-        return bookRepo.findById(bookId)
-                .orElseThrow(() -> new BookNotFoundException(String.format(BOOK_NOT_FOUND_BY_ID, bookId)));
-    }
-
     private AppUser findUserByEmail(String email) {
         return userRepo.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_EMAIL, email)));
     }
 
-    private AppUser findUserById(Long id) {
-        return userRepo.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_ID, id)));
-    }
+
 }

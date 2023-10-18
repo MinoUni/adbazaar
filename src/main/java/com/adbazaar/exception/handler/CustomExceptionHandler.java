@@ -8,6 +8,7 @@ import com.adbazaar.exception.JwtTokenException;
 import com.adbazaar.exception.RefreshTokenException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
+import com.adbazaar.exception.UserNotMatchWithJwtException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -80,6 +81,10 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleOtherExceptions(Exception e) {
         return buildExceptionResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, List.of());
+    }
+    @ExceptionHandler(UserNotMatchWithJwtException.class)
+    public ResponseEntity<Object> handleUserNotMatchWithJwtException(UserNotMatchWithJwtException e) {
+        return buildExceptionResponse(e, HttpStatus.UNAUTHORIZED, List.of());
     }
 
     @ExceptionHandler(BookException.class)

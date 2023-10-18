@@ -1,19 +1,13 @@
 package com.adbazaar.controller;
 
-import com.adbazaar.dto.ApiResp;
-import com.adbazaar.dto.comment.BookComment;
-import com.adbazaar.dto.comment.NewComment;
+import com.adbazaar.dto.comment.UserBookComment;
 import com.adbazaar.service.CommentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,18 +15,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Comments Management")
 @RestController
-@RequestMapping("/messages")
+@RequestMapping("/comments")
 public class CommentController {
 
-    private final CommentService messageService;
+    private final CommentService commentService;
 
-    @PostMapping
-    public ResponseEntity<ApiResp> addComment(@Valid @RequestBody NewComment newComment) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(messageService.create(newComment));
-    }
-
-    @GetMapping("/users/{id}")
-    public ResponseEntity<List<BookComment>> getCommentsByUserId(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(messageService.findCommentsByUserId(id));
+    @GetMapping
+    public ResponseEntity<List<UserBookComment>> getAllUserComments(@RequestParam("userId") Long id) {
+        return ResponseEntity.ok(commentService.findAllUserCommentsById(id));
     }
 }
