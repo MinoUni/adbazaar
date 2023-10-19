@@ -39,20 +39,19 @@ spring:
         web-allow-others: true
   jpa:
     show-sql: false
-    database: h2
+    database: postgresql
     defer-datasource-initialization: true
     hibernate:
       ddl-auto: create-drop
     properties:
       hibernate:
         format-sql: true
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    # H2 Database
-    url: jdbc:h2:mem:addbazar
-    username: sa
-    password: password
-    driverClassName: org.h2.Driver
+    url: jdbc:${DB_URL}
+    username: ${DB_USERNAME}admin
+    password: ${DB_PASSWORD}
+    driverClassName: org.postgresql.Driver
 # APPLICATION
 application:
   # JWT
