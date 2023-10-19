@@ -134,8 +134,9 @@ public class UserController {
     )
     @PostMapping("/{id}/favorites")
     public ResponseEntity<ApiResp> addBookToFavorites(@PathVariable("id") Long userId,
-                                                      @RequestParam("bookId") Long bookId) {
-        return ResponseEntity.ok(bookService.addToUserFavorites(userId, bookId));
+                                                      @RequestParam("bookId") Long bookId,
+                                                      @RequestHeader(AUTHORIZATION) String token) {
+        return ResponseEntity.ok(bookService.addToUserFavorites(userId, bookId, token));
     }
 
     @Operation(
@@ -160,7 +161,8 @@ public class UserController {
     )
     @PostMapping("/{id}/orders")
     public ResponseEntity<ApiResp> addBookToOrders(@PathVariable("id") Long userId,
-                                                   @RequestParam("bookId") Long bookId) {
-        return ResponseEntity.ok(bookService.addToUserOrders(userId, bookId));
+                                                   @RequestParam("bookId") Long bookId,
+                                                   @RequestHeader(AUTHORIZATION) String token) {
+        return ResponseEntity.ok(bookService.addToUserOrders(userId, bookId, token));
     }
 }

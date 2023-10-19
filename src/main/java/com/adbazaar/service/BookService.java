@@ -60,8 +60,8 @@ public class BookService {
         return mapper.bookToBookDetails(book);
     }
 
-    public ApiResp addToUserFavorites(Long userId, Long bookId) {
-        var user = checkIsUserVerified(userId);
+    public ApiResp addToUserFavorites(Long userId, Long bookId, String token) {
+        var user = validateThatSameUserCredentials(userId, token);
         var book = findBookById(bookId);
         if (user.getEmail().equals(book.getSeller().getEmail())) {
             throw new BookException(String.format(USER_AND_SELLER_ARE_THE_SAME, user.getEmail(), book.getSeller().getEmail()));
@@ -75,8 +75,8 @@ public class BookService {
         return ApiResp.build(HttpStatus.OK, String.format(USER_ADD_TO_FAVORITES_OK, userId, bookId));
     }
 
-    public ApiResp addToUserOrders(Long userId, Long bookId) {
-        var user = checkIsUserVerified(userId);
+    public ApiResp addToUserOrders(Long userId, Long bookId, String token) {
+        var user = validateThatSameUserCredentials(userId, token);
         var book = findBookById(bookId);
         if (user.getEmail().equals(book.getSeller().getEmail())) {
             throw new BookException(String.format(USER_AND_SELLER_ARE_THE_SAME, user.getEmail(), book.getSeller().getEmail()));
