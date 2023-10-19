@@ -1,7 +1,7 @@
 INSERT INTO users(full_name, email, verified, password, role, creation_date, phone, birth_date) VALUES
-('AddBazaar', 'addbazaar@gmail.com', true, '$2a$10$zYGR9fbf06HkEu7XcZg3kusxQbTA8NNXBmqamigU0jd.pFXFYL7Zi', 'ROLE_USER', CURRENT_DATE(), '+380112223333', CURRENT_DATE()),
-('Test Verified', 'test.verif@gmail.com', true, '$2a$10$zYGR9fbf06HkEu7XcZg3kusxQbTA8NNXBmqamigU0jd.pFXFYL7Zi', 'ROLE_USER', CURRENT_DATE(), '+380112223333', CURRENT_DATE()),
-('Test Unverified', 'test.unverif@gmail.com', false, '$2a$10$zYGR9fbf06HkEu7XcZg3kusxQbTA8NNXBmqamigU0jd.pFXFYL7Zi', 'ROLE_USER', CURRENT_DATE(), '+380112223333', CURRENT_DATE());
+('AddBazaar', 'addbazaar@gmail.com', true, '$2a$10$zYGR9fbf06HkEu7XcZg3kusxQbTA8NNXBmqamigU0jd.pFXFYL7Zi', 'ROLE_USER', CURRENT_DATE, '+380112223333', CURRENT_DATE),
+('Test Verified', 'test.verif@gmail.com', true, '$2a$10$zYGR9fbf06HkEu7XcZg3kusxQbTA8NNXBmqamigU0jd.pFXFYL7Zi', 'ROLE_USER', CURRENT_DATE, '+380112223333', CURRENT_DATE),
+('Test Unverified', 'test.unverif@gmail.com', false, '$2a$10$zYGR9fbf06HkEu7XcZg3kusxQbTA8NNXBmqamigU0jd.pFXFYL7Zi', 'ROLE_USER', CURRENT_DATE, '+380112223333', CURRENT_DATE);
 
 INSERT INTO books(user_id, title, author, format, rate, quantity, price, genre, language, publishing_house, image_path, description) VALUES
 (1, 'The Great Gatsby', 'F.Scott Fitzgerald', 'paper', 0.0, 1, 82.15, 'fiction', 'en', 'Scribner',
