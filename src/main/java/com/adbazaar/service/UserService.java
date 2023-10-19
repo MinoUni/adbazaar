@@ -22,6 +22,7 @@ import com.adbazaar.security.JwtService;
 import com.adbazaar.utils.CustomMapper;
 import com.adbazaar.utils.MailUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,8 +41,10 @@ import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_CODE_EXPIRED;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_INVALID_CODE;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_REASSIGNED;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_SUCCESSFUL;
+import static com.adbazaar.utils.MessageUtils.VERIFICATION_MAIL_SUBJECT;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class UserService {
 
@@ -71,8 +74,8 @@ public class UserService {
         var user = AppUser.build(userDetails);
         var code = userVerifyTokenRepo.save(user.getEmail(), VerificationCode.build(user.getEmail()));
         userRepo.save(user);
-        System.out.println("==== CODE: " + code.getCode() + " ====");
-//        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
+        log.info("==== CODE: {}  for User: {} ====", code.getCode(), user.getEmail());
+        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
         return RegistrationResponse.builder().email(user.getEmail()).build();
     }
 
@@ -111,8 +114,8 @@ public class UserService {
             throw new AccountVerificationException(String.format(USER_ALREADY_VERIFIED, user.getEmail()));
         }
         var code = userVerifyTokenRepo.save(user.getEmail(), VerificationCode.build(user.getEmail()));
-        System.out.println("==== REASSIGN CODE: " + code.getCode() + " ====");
-//        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
+        log.info("==== CODE REASSIGN: {}  for User: {} ====", code.getCode(), user.getEmail());
+        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
         return ApiResp.build(HttpStatus.OK, String.format(USER_VERIFICATION_REASSIGNED, email));
     }
 
