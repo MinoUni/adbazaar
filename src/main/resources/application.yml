@@ -43,10 +43,10 @@ spring:
         format-sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
+    driverClassName: org.postgresql.Driver
     url: jdbc:${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    driverClassName: org.postgresql.Driver
 # APPLICATION
 application:
   # JWT

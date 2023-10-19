@@ -78,10 +78,10 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildExceptionResponse(e, HttpStatus.UNAUTHORIZED, List.of());
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleOtherExceptions(Exception e) {
-        return buildExceptionResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, List.of());
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<Object> handleOtherExceptions(Exception e) {
+//        return buildExceptionResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, List.of());
+//    }
 
     @ExceptionHandler(UserNotMatchWithJwtException.class)
     public ResponseEntity<Object> handleUserNotMatchWithJwtException(UserNotMatchWithJwtException e) {
