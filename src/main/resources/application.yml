@@ -42,7 +42,7 @@ spring:
     database: postgresql
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     properties:
       hibernate:
         format-sql: true
