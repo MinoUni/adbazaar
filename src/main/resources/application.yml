@@ -4,9 +4,6 @@ logging:
     root: INFO
 # SPRING
 spring:
-  sql:
-    init:
-      mode: always
 #  SECURITY
   security:
     oauth2:
@@ -32,11 +29,9 @@ spring:
             enable: true
         transport:
           protocol: smtp
-  h2:
-    console:
-      enabled: true
-      settings:
-        web-allow-others: true
+  sql:
+    init:
+      mode: always
   jpa:
     show-sql: false
     database: postgresql
