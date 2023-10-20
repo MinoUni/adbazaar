@@ -2,6 +2,7 @@ package com.adbazaar.configuration;
 
 import com.adbazaar.security.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -48,7 +49,7 @@ public class SecurityConfiguration {
                                 mvc.pattern("/configuration/security"),
                                 mvc.pattern("/swagger-ui/**"),
                                 mvc.pattern("/webjars/**"),
-                                mvc.pattern("/swagger-ui.html"))
+                                mvc.pattern("/swagger-ui.html"), PathRequest.toH2Console())
                         .permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)

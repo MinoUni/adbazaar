@@ -4,6 +4,8 @@ logging:
     root: INFO
 # SPRING
 spring:
+  profiles:
+    active: dev_qa
 #  SECURITY
   security:
     oauth2:
