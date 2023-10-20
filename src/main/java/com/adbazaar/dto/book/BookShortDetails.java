@@ -28,7 +28,7 @@ public class BookShortDetails {
 
     private String format;
 
-    private BigDecimal rate;
+    private Double rate;
 
     private Integer quantity;
 

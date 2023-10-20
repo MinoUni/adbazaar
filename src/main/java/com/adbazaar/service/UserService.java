@@ -75,7 +75,7 @@ public class UserService {
         var code = userVerifyTokenRepo.save(user.getEmail(), VerificationCode.build(user.getEmail()));
         userRepo.save(user);
         log.info("==== CODE: {}  for User: {} ====", code.getCode(), user.getEmail());
-        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
+//        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
         return RegistrationResponse.builder().email(user.getEmail()).build();
     }
 
@@ -115,7 +115,7 @@ public class UserService {
         }
         var code = userVerifyTokenRepo.save(user.getEmail(), VerificationCode.build(user.getEmail()));
         log.info("==== CODE REASSIGN: {}  for User: {} ====", code.getCode(), user.getEmail());
-        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
+//        mailUtils.sendEmail(user, code, VERIFICATION_MAIL_SUBJECT);
         return ApiResp.build(HttpStatus.OK, String.format(USER_VERIFICATION_REASSIGNED, email));
     }
 

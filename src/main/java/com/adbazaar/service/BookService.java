@@ -121,18 +121,13 @@ public class BookService {
     }
 
     private AppUser validateThatSameUserCredentials(Long userId, String token) {
-        var user = checkIsUserVerified(userId);
-        var email = jwtService.extractUsernameFromAccessToken(token.substring(7));
-        if (!user.getEmail().equals(email)) {
-            throw new UserNotMatchWithJwtException(String.format(USER_NOT_MATCH_WITH_JWT, user.getEmail(), email));
-        }
-        return user;
-    }
-
-    private AppUser checkIsUserVerified(Long userId) {
         var user = findUserById(userId);
         if (!user.getIsVerified()) {
             throw new AccountVerificationException(String.format(USER_NOT_VERIFIED, user.getEmail()));
+        }
+        var email = jwtService.extractUsernameFromAccessToken(token.substring(7));
+        if (!user.getEmail().equals(email)) {
+            throw new UserNotMatchWithJwtException(String.format(USER_NOT_MATCH_WITH_JWT, user.getEmail(), email));
         }
         return user;
     }

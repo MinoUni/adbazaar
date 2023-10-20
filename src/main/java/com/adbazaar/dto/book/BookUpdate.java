@@ -20,8 +20,6 @@ public class BookUpdate {
 
     private String format;
 
-    private BigDecimal rate;
-
     @JsonProperty("image_path")
     private String imagePath;
 
