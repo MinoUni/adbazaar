@@ -85,11 +85,26 @@ public class UserController {
             }
     )
     @PostMapping("/{id}/books")
-    public ResponseEntity<ApiResp> addBook(@PathVariable("id") Long userId,
-                                           @RequestBody NewBook productDetails) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.create(userId, productDetails));
+    public ResponseEntity<ApiResp> addBook(@RequestHeader(AUTHORIZATION) String token,
+                                           @PathVariable("id") Long userId,
+                                           @Valid @RequestBody NewBook newBook) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.create(userId, token, newBook));
     }
 
+    @Operation(
+            summary = "Delete book by id",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "User delete a book",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiResp.class))}),
+                    @ApiResponse(responseCode = "401",
+                            description = "Unauthorized",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))}),
+                    @ApiResponse(responseCode = "404",
+                            description = "User/Book not found",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))})
+            }
+    )
     @DeleteMapping("/{userId}/books/{bookId}")
     public ResponseEntity<ApiResp> deleteById(@PathVariable("userId") Long userId,
                                               @PathVariable("bookId") Long bookId,
@@ -97,14 +112,45 @@ public class UserController {
         return ResponseEntity.ok(bookService.deleteBookById(userId, bookId, token));
     }
 
+    @Operation(
+            summary = "Update book by id",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "User update book details",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiResp.class))}),
+                    @ApiResponse(responseCode = "401",
+                            description = "Unauthorized",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))}),
+                    @ApiResponse(responseCode = "404",
+                            description = "User/Book not found",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))}),
+                    @ApiResponse(responseCode = "400",
+                            description = "Validation failed",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))})
+            }
+    )
     @PatchMapping("/{userId}/books/{bookId}")
     public ResponseEntity<ApiResp> updateById(@PathVariable("userId") Long userId,
                                               @PathVariable("bookId") Long bookId,
                                               @RequestHeader(AUTHORIZATION) String token,
-                                              @RequestBody BookUpdate details) {
+                                              @Valid @RequestBody BookUpdate details) {
         return ResponseEntity.ok(bookService.updateById(userId, bookId, details, token));
     }
 
+    @Operation(
+            summary = "Delete book by id",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "User delete a book",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiResp.class))}),
+                    @ApiResponse(responseCode = "401",
+                            description = "Unauthorized",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))}),
+                    @ApiResponse(responseCode = "404",
+                            description = "User/Book not found",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))})
+            }
+    )
     @PostMapping("/{userId}/books/{bookId}/comments")
     public ResponseEntity<ApiResp> addComment(@PathVariable("userId") Long userId,
                                               @PathVariable("bookId") Long bookId,

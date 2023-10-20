@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import static com.adbazaar.utils.MessageUtils.BOOK_ALREADY_EXISTS;
 import static com.adbazaar.utils.MessageUtils.BOOK_ALREADY_IN_FAVORITES;
 import static com.adbazaar.utils.MessageUtils.BOOK_ALREADY_IN_ORDERS;
 import static com.adbazaar.utils.MessageUtils.BOOK_CREATED;
@@ -48,9 +49,13 @@ public class BookService {
 
     private final JwtService jwtService;
 
-    public ApiResp create(Long userId, NewBook productDetails) {
-        var user = findUserById(userId);
-        var book = Book.build(productDetails, user);
+    public ApiResp create(Long userId, String token, NewBook newBook) {
+        var user = validateThatSameUserCredentials(userId, token);
+        if(bookRepo.existsByParams(newBook.getTitle(), newBook.getAuthor(), newBook.getFormat(),
+                newBook.getGenre(), newBook.getLanguage(), newBook.getPublishHouse())) {
+            throw new BookException(BOOK_ALREADY_EXISTS);
+        }
+        var book = Book.build(newBook, user);
         bookRepo.save(book);
         return ApiResp.build(HttpStatus.CREATED, String.format(BOOK_CREATED, userId));
     }

@@ -48,6 +48,8 @@ public final class MessageUtils {
 
     public static final String BOOK_NOT_FOUND_BY_ID = "Book with id: {%d} not found";
 
+    public static final String BOOK_ALREADY_EXISTS = "Book with such parameters already exists.";
+
     public static final String BOOK_ALREADY_IN_FAVORITES = "Book with id: {%d} already in favorite list of user with id: {%d}";
 
     public static final String BOOK_ALREADY_IN_ORDERS = "Book with id: {%d} already in orders list of user with id: {%d}";
