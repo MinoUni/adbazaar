@@ -52,9 +52,9 @@ public class Book {
 
     private String format;
 
-    @Column(precision = 8, scale = 2)
     @Builder.Default
-    private BigDecimal rate = BigDecimal.valueOf(0);
+    @Column(columnDefinition = "Decimal(5, 2)")
+    private Double rate = 0.0;
 
     @Builder.Default
     private Integer quantity = 0;

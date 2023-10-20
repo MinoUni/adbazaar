@@ -138,10 +138,10 @@ public class UserController {
     }
 
     @Operation(
-            summary = "Delete book by id",
+            summary = "Add comment to a book",
             responses = {
                     @ApiResponse(responseCode = "200",
-                            description = "User delete a book",
+                            description = "User add comment to a book",
                             content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiResp.class))}),
                     @ApiResponse(responseCode = "401",
                             description = "Unauthorized",
@@ -154,8 +154,9 @@ public class UserController {
     @PostMapping("/{userId}/books/{bookId}/comments")
     public ResponseEntity<ApiResp> addComment(@PathVariable("userId") Long userId,
                                               @PathVariable("bookId") Long bookId,
+                                              @RequestHeader(AUTHORIZATION) String token,
                                               @Valid @RequestBody NewComment comment) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.create(userId, bookId, comment));
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.create(userId, bookId, token, comment));
     }
 
     @Operation(

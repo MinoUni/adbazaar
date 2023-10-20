@@ -30,6 +30,8 @@ public final class MessageUtils {
 
     public static final String USER_NOT_MATCH_WITH_JWT = "User: {%s} not match with jwt username: {%s}";
 
+    public static final String USER_ADD_COMMENT_TO_A_BOOK = "The User: {%d} added a comment to a Book: {%d}.";
+
     public static final String REFRESH_TOKEN_NOT_FOUND = "JWT refresh associated with user: {%s} not found";
 
     public static final String REFRESH_TOKEN_INVALID_OR_EXPIRED = "Provided refresh JWT is invalid or expired";
@@ -55,4 +57,6 @@ public final class MessageUtils {
     public static final String BOOK_ALREADY_IN_ORDERS = "Book with id: {%d} already in orders list of user with id: {%d}";
 
     public static final String BOOK_NOT_FOUND_IN_USER_BOOKS_LIST = "Book with id: {%d} not found in users: {%d} book list.";
+
+    public static final String BOOK_RATE_COUNT_FAIL = "Failed to count book rate";
 }

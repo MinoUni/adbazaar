@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -29,7 +28,7 @@ public class UserBookComment {
 
     private String message;
 
-    private BigDecimal rate;
+    private Double rate;
 
     private Integer likes;
 

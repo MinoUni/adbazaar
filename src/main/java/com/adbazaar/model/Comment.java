@@ -4,9 +4,9 @@ import com.adbazaar.dto.comment.NewComment;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 public class Comment {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -44,12 +44,12 @@ public class Comment {
     @Column(name = "creation_date")
     private LocalDateTime creationDate = LocalDateTime.now();
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String message;
 
     @Builder.Default
-    private Integer rate = 0;
+    @Column(columnDefinition = "Decimal(5, 2)")
+    private Double rate = 0.0;
 
     @Builder.Default
     private Integer likes = 0;
