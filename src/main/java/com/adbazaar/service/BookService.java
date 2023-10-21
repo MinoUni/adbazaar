@@ -61,8 +61,9 @@ public class BookService {
     }
 
     public BookDetails findBookDetailsById(Long id) {
-        var book = findBookById(id);
-        return mapper.bookToBookDetails(book);
+        var book = bookRepo.findBookDetailsById(id).orElseThrow();
+        book.setComments(bookRepo.findAllBookComments(book.getId()));
+        return book;
     }
 
     public ApiResp addToUserFavorites(Long userId, Long bookId, String token) {

@@ -1,21 +1,12 @@
 package com.adbazaar.utils;
 
-import com.adbazaar.dto.book.BookDetails;
 import com.adbazaar.dto.book.BookUpdate;
-import com.adbazaar.dto.book.SellerDetails;
-import com.adbazaar.dto.book.UserBook;
-import com.adbazaar.dto.comment.BookComment;
-import com.adbazaar.model.AppUser;
 import com.adbazaar.model.Book;
-import com.adbazaar.model.Comment;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-
-import java.util.List;
-import java.util.Set;
 
 @Mapper(componentModel = "spring")
 public interface CustomMapper {
@@ -28,13 +19,4 @@ public interface CustomMapper {
     @Mapping(target = "buyers", ignore = true)
     void updateBook(BookUpdate updateDetails, @MappingTarget Book book);
 
-    Set<UserBook> booksToUserBooks(Set<Book> userBooks);
-
-    BookDetails bookToBookDetails(Book book);
-
-    SellerDetails userToSellerDetails(AppUser user);
-
-    List<BookComment> commentToBookComment(List<Comment> comments);
-
-    String extractFullNameFromUser(AppUser user);
 }

@@ -28,7 +28,7 @@ public class BookDetails {
 
     private String format;
 
-    private BigDecimal rate;
+    private Double rate;
 
     private Integer quantity;
 
@@ -45,4 +45,31 @@ public class BookDetails {
 
     private List<BookComment> comments = new ArrayList<>();
 
+    public BookDetails(Long id,
+                       String title,
+                       String author,
+                       String description,
+                       String imagePath,
+                       String format,
+                       Double rate,
+                       Integer quantity,
+                       BigDecimal price,
+                       String genre,
+                       String publishHouse,
+                       String language,
+                       SellerDetails seller) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.description = description;
+        this.imagePath = imagePath;
+        this.format = format;
+        this.rate = rate;
+        this.quantity = quantity;
+        this.price = price;
+        this.genre = genre;
+        this.publishHouse = publishHouse;
+        this.language = language;
+        this.seller = seller;
+    }
 }

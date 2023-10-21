@@ -6,8 +6,6 @@ import com.adbazaar.dto.authentication.LoginResponse;
 import com.adbazaar.dto.authentication.RegistrationRequest;
 import com.adbazaar.dto.authentication.RegistrationResponse;
 import com.adbazaar.dto.authentication.UserVerification;
-import com.adbazaar.dto.book.UserBook;
-import com.adbazaar.dto.comment.UserComment;
 import com.adbazaar.dto.user.UserDetails;
 import com.adbazaar.exception.AccountVerificationException;
 import com.adbazaar.exception.UserAlreadyExistException;
@@ -30,9 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import static com.adbazaar.utils.MessageUtils.USER_ALREADY_EXIST;
 import static com.adbazaar.utils.MessageUtils.USER_ALREADY_VERIFIED;
@@ -41,7 +37,6 @@ import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_CODE_EXPIRED;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_INVALID_CODE;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_REASSIGNED;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_SUCCESSFUL;
-import static com.adbazaar.utils.MessageUtils.VERIFICATION_MAIL_SUBJECT;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -121,12 +116,13 @@ public class UserService {
 
     public UserDetails findUserDetailsByJwt(String token) {
         var email = jwtService.extractUsernameFromAccessToken(token.substring(7));
-        var user = findUserByEmail(email);
-        List<UserBook> books = bookRepo.findAllUserBooks(user.getId());
-        List<UserComment> comments = commentRepo.findAllUserComments(user.getId());
-        Set<UserBook> favorites = mapper.booksToUserBooks(user.getFavoriteBooks());
-        Set<UserBook> orders = mapper.booksToUserBooks(user.getOrders());
-        return UserDetails.build(user, books, comments, favorites, orders);
+        var user = userRepo.findUserDetailsByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_EMAIL, email)));
+        user.setComments(commentRepo.findAllUserComments(user.getId()));
+        user.setBooks(bookRepo.findAllUserBooks(user.getId()));
+        user.setFavorites(bookRepo.findAllUserFavoriteBooks(user.getId()));
+        user.setOrders(bookRepo.findAllUserOrderedBooks(user.getId()));
+        return user;
     }
 
     private AppUser findUserByEmail(String email) {

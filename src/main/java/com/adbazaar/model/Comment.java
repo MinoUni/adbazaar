@@ -62,7 +62,7 @@ public class Comment {
                 .author(author)
                 .book(book)
                 .message(details.getMessage())
-                .rate(details.getRate())
+                .rate(Math.round(details.getRate() * 2.0) / 2.0)
                 .build();
     }
 }

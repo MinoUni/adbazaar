@@ -71,7 +71,7 @@ public class CommentService {
     private void countBookRate(Book book) {
         double avg = book.getComments()
                 .stream()
-                .mapToDouble(comment -> Math.round(comment.getRate() * 2.0) / 2.0)
+                .mapToDouble(Comment::getRate)
                 .average()
                 .orElseThrow(() -> new BookException(BOOK_RATE_COUNT_FAIL));
         book.setRate(avg);
