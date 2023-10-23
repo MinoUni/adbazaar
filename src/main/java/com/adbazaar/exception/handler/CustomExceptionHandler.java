@@ -9,6 +9,7 @@ import com.adbazaar.exception.RefreshTokenException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
 import com.adbazaar.exception.UserNotMatchWithJwtException;
+import com.adbazaar.exception.UserPasswordException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -75,6 +76,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Object> handleAuthenticationException(AuthenticationException e) {
+        return buildExceptionResponse(e, HttpStatus.UNAUTHORIZED, List.of());
+    }
+
+    @ExceptionHandler(UserPasswordException.class)
+    public ResponseEntity<Object> handleUserPasswordException(UserPasswordException e) {
         return buildExceptionResponse(e, HttpStatus.UNAUTHORIZED, List.of());
     }
 

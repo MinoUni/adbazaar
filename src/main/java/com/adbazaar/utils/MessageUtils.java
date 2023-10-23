@@ -36,6 +36,8 @@ public final class MessageUtils {
 
     public static final String USER_ADD_COMMENT_TO_A_BOOK = "The User: {%d} added a comment to a Book: {%d}.";
 
+    public static final String USER_PASSWORD_CHANGE_OK = "User: {%d} changed password";
+
     public static final String REFRESH_TOKEN_NOT_FOUND = "JWT refresh associated with user: {%s} not found";
 
     public static final String REFRESH_TOKEN_INVALID_OR_EXPIRED = "Provided refresh JWT is invalid or expired";

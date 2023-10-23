@@ -8,6 +8,7 @@ import com.adbazaar.dto.authentication.RegistrationResponse;
 import com.adbazaar.dto.authentication.UserVerification;
 import com.adbazaar.dto.book.FavoriteBookResp;
 import com.adbazaar.dto.book.OrderedBookResp;
+import com.adbazaar.dto.user.ChangePassCredentials;
 import com.adbazaar.dto.user.UserDetails;
 import com.adbazaar.dto.user.UserUpdate;
 import com.adbazaar.exception.AccountVerificationException;
@@ -48,6 +49,7 @@ import static com.adbazaar.utils.MessageUtils.USER_AND_SELLER_ARE_THE_SAME;
 import static com.adbazaar.utils.MessageUtils.USER_DELETE_FROM_FAVORITES_OK;
 import static com.adbazaar.utils.MessageUtils.USER_DELETE_FROM_ORDERS_OK;
 import static com.adbazaar.utils.MessageUtils.USER_NOT_FOUND_BY_EMAIL;
+import static com.adbazaar.utils.MessageUtils.USER_PASSWORD_CHANGE_OK;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_CODE_EXPIRED;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_INVALID_CODE;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_REASSIGNED;
@@ -203,6 +205,13 @@ public class UserService {
         return findUserDetailsByJwt(token);
     }
 
+    public ApiResp changeUserPassword(Long id, String token, ChangePassCredentials request) {
+        var user = serviceUtils.validateThatSameUserCredentials(id, token);
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), request.getCurPassword()));
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepo.save(user);
+        return ApiResp.build(HttpStatus.OK, String.format(USER_PASSWORD_CHANGE_OK, id));
+    }
 
     private AppUser findUserByEmail(String email) {
         return userRepo.findByEmail(email)

@@ -7,6 +7,7 @@ import com.adbazaar.dto.book.FavoriteBookResp;
 import com.adbazaar.dto.book.NewBook;
 import com.adbazaar.dto.book.OrderedBookResp;
 import com.adbazaar.dto.comment.NewComment;
+import com.adbazaar.dto.user.ChangePassCredentials;
 import com.adbazaar.dto.user.UserDetails;
 import com.adbazaar.dto.user.UserUpdate;
 import com.adbazaar.service.BookService;
@@ -74,7 +75,7 @@ public class UserController {
             summary = "Update user details",
             responses = {
                     @ApiResponse(responseCode = "200",
-                            description = "User details fetched",
+                            description = "User details updated and fetched",
                             content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDetails.class))}),
                     @ApiResponse(responseCode = "401",
                             description = "Unauthorized",
@@ -92,6 +93,30 @@ public class UserController {
                                                          @PathVariable("id") Long id,
                                                          @Valid @RequestBody UserUpdate detailsUpdate) {
         return ResponseEntity.ok(userService.updateUserDetails(id, token, detailsUpdate));
+    }
+
+    @Operation(
+            summary = "Change user password",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "User password changed",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiResp.class))}),
+                    @ApiResponse(responseCode = "401",
+                            description = "Unauthorized",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))}),
+                    @ApiResponse(responseCode = "404",
+                            description = "User not found",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))}),
+                    @ApiResponse(responseCode = "400",
+                            description = "Validation failed",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))})
+            }
+    )
+    @PatchMapping("{id}/password")
+    public ResponseEntity<ApiResp> changeUserPassword(@RequestHeader(AUTHORIZATION) String token,
+                                                      @PathVariable("id") Long id,
+                                                      @Valid @RequestBody ChangePassCredentials request) {
+        return ResponseEntity.ok(userService.changeUserPassword(id, token, request));
     }
 
     @Operation(
