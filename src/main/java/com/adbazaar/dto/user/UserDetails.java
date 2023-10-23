@@ -1,6 +1,7 @@
 package com.adbazaar.dto.user;
 
 import com.adbazaar.dto.book.UserBook;
+import com.adbazaar.dto.book.UserBookOrders;
 import com.adbazaar.dto.comment.UserComment;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,7 +36,7 @@ public class UserDetails {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
 
-    private Set<UserBook> orders = new HashSet<>();
+    private Set<UserBookOrders> orders = new HashSet<>();
 
     private Set<UserBook> favorites = new HashSet<>();
 

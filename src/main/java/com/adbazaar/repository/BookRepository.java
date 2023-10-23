@@ -3,6 +3,7 @@ package com.adbazaar.repository;
 import com.adbazaar.dto.book.BookDetails;
 import com.adbazaar.dto.book.BookShortDetails;
 import com.adbazaar.dto.book.UserBook;
+import com.adbazaar.dto.book.UserBookOrders;
 import com.adbazaar.dto.comment.BookComment;
 import com.adbazaar.model.Book;
 import org.springframework.data.domain.Page;
@@ -41,11 +42,11 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Set<UserBook> findAllUserFavoriteBooks(@Param("id") Long id);
 
     @Query("""
-            SELECT new com.adbazaar.dto.book.UserBook(b.id, b.author, b.title, b.imagePath, b.rate, b.price)
+            SELECT new com.adbazaar.dto.book.UserBookOrders(b.id, b.author, b.title, b.imagePath, b.rate, b.price, b.quantity)
             FROM Book b
             INNER JOIN b.buyers u
             WHERE u.id = :id""")
-    Set<UserBook> findAllUserOrderedBooks(@Param("id") Long id);
+    Set<UserBookOrders> findAllUserOrderedBooks(@Param("id") Long id);
 
     @Query("""
             SELECT new com.adbazaar.dto.book.BookDetails(b.id, b.title, b.author, b.description, b.imagePath, b.format, b.rate, b.quantity, b.price, b.genre, b.publishHouse, b.language,
