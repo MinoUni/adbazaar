@@ -9,6 +9,7 @@ import com.adbazaar.dto.authentication.UserVerification;
 import com.adbazaar.dto.book.FavoriteBookResp;
 import com.adbazaar.dto.book.OrderedBookResp;
 import com.adbazaar.dto.user.UserDetails;
+import com.adbazaar.dto.user.UserUpdate;
 import com.adbazaar.exception.AccountVerificationException;
 import com.adbazaar.exception.BookException;
 import com.adbazaar.exception.BookNotFoundException;
@@ -21,6 +22,7 @@ import com.adbazaar.repository.CommentRepository;
 import com.adbazaar.repository.UserRepository;
 import com.adbazaar.repository.UserVerifyTokenRepository;
 import com.adbazaar.security.JwtService;
+import com.adbazaar.utils.CustomMapper;
 import com.adbazaar.utils.MailUtils;
 import com.adbazaar.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
@@ -73,6 +75,8 @@ public class UserService {
     private final MailUtils mailUtils;
 
     private final ServiceUtils serviceUtils;
+
+    private final CustomMapper mapper;
 
     public RegistrationResponse createUser(RegistrationRequest userDetails) {
         if (userRepo.existsByEmail(userDetails.getEmail())) {
@@ -192,10 +196,17 @@ public class UserService {
         return FavoriteBookResp.build(bookId, String.format(USER_DELETE_FROM_FAVORITES_OK, userId, bookId), HttpStatus.OK);
     }
 
+    public UserDetails updateUserDetails(Long id, String token, UserUpdate detailsUpdate) {
+        var user = serviceUtils.validateThatSameUserCredentials(id, token);
+        mapper.mapUserUpdateToAppUser(detailsUpdate, user);
+        userRepo.save(user);
+        return findUserDetailsByJwt(token);
+    }
+
+
     private AppUser findUserByEmail(String email) {
         return userRepo.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_EMAIL, email)));
     }
-
 
 }

@@ -8,6 +8,7 @@ import com.adbazaar.dto.book.NewBook;
 import com.adbazaar.dto.book.OrderedBookResp;
 import com.adbazaar.dto.comment.NewComment;
 import com.adbazaar.dto.user.UserDetails;
+import com.adbazaar.dto.user.UserUpdate;
 import com.adbazaar.service.BookService;
 import com.adbazaar.service.CommentService;
 import com.adbazaar.service.UserService;
@@ -67,6 +68,30 @@ public class UserController {
     @GetMapping("/token")
     public ResponseEntity<UserDetails> getUserByJwt(@RequestHeader(AUTHORIZATION) String token) {
         return ResponseEntity.ok(userService.findUserDetailsByJwt(token));
+    }
+
+    @Operation(
+            summary = "Update user details",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "User details fetched",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDetails.class))}),
+                    @ApiResponse(responseCode = "401",
+                            description = "Unauthorized",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))}),
+                    @ApiResponse(responseCode = "404",
+                            description = "User not found",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))}),
+                    @ApiResponse(responseCode = "400",
+                            description = "Validation failed",
+                            content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))})
+            }
+    )
+    @PatchMapping("{id}")
+    public ResponseEntity<UserDetails> updateUserDetails(@RequestHeader(AUTHORIZATION) String token,
+                                                         @PathVariable("id") Long id,
+                                                         @Valid @RequestBody UserUpdate detailsUpdate) {
+        return ResponseEntity.ok(userService.updateUserDetails(id, token, detailsUpdate));
     }
 
     @Operation(

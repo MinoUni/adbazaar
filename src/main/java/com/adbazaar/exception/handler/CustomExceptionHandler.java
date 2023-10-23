@@ -50,7 +50,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(MailSendException.class)
     public ResponseEntity<Object> handleMailSendException(MailSendException e) {
-        return buildExceptionResponse(e, HttpStatus.BAD_REQUEST, List.of());
+        return buildExceptionResponse(e, HttpStatus.BAD_REQUEST, List.of("Mail send error"));
     }
 
     @ExceptionHandler(JwtTokenException.class)
