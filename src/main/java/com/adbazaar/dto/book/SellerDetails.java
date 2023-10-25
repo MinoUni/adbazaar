@@ -24,7 +24,7 @@ public class SellerDetails {
 
     private String phone;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @JsonProperty("creation_date")
     private LocalDate creationDate;
 

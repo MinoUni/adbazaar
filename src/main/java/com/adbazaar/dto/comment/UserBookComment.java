@@ -21,7 +21,7 @@ public class UserBookComment {
     @JsonProperty("author")
     private String fullName;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ssa")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy hh:mm:ssa")
     @JsonProperty("creation_date")
     private LocalDateTime creationDate;
 

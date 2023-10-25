@@ -25,7 +25,7 @@ public class OrderedBookResp {
     private Integer status;
 
     @Builder.Default
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ssa")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy hh:mm:ssa")
     private LocalDateTime timestamp = LocalDateTime.now();
 
     public static OrderedBookResp build(Long id, String message, HttpStatus status) {

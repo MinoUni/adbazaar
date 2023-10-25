@@ -24,7 +24,7 @@ public class UserUpdate {
 
     @Past
     @JsonProperty("birth_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate dateOfBirth;
 
     @Pattern(regexp = "^\\([0-9]{3}\\) [0-9]{3}-[0-9]{4}$",
