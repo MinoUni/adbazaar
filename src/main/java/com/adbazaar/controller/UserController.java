@@ -91,7 +91,7 @@ public class UserController {
     @PatchMapping("{id}")
     public ResponseEntity<UserDetails> updateUserDetails(@RequestHeader(AUTHORIZATION) String token,
                                                          @PathVariable("id") Long id,
-                                                         @Valid @RequestBody UserUpdate detailsUpdate) {
+                                                         @RequestBody UserUpdate detailsUpdate) {
         return ResponseEntity.ok(userService.updateUserDetails(id, token, detailsUpdate));
     }
 

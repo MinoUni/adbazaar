@@ -13,6 +13,10 @@ public class UserSocialsRepository {
     private final Map<String, List<String>> usersSocials = new ConcurrentHashMap<>();
 
     public void save(String email, List<String> socials) {
+        if (socials == null) {
+            usersSocials.put(email, List.of());
+            return;
+        }
         usersSocials.put(email, socials);
     }
 

@@ -27,6 +27,7 @@ public interface CustomMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "email", ignore = true)
     @Mapping(target = "role", ignore = true)
+    @Mapping(target = "imageUrl", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "isVerified", ignore = true)
