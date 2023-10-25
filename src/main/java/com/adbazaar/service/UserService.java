@@ -21,6 +21,7 @@ import com.adbazaar.model.VerificationCode;
 import com.adbazaar.repository.BookRepository;
 import com.adbazaar.repository.CommentRepository;
 import com.adbazaar.repository.UserRepository;
+import com.adbazaar.repository.UserSocialsRepository;
 import com.adbazaar.repository.UserVerifyTokenRepository;
 import com.adbazaar.security.JwtService;
 import com.adbazaar.utils.CustomMapper;
@@ -65,6 +66,8 @@ public class UserService {
     private final BookRepository bookRepo;
 
     private final UserVerifyTokenRepository userVerifyTokenRepo;
+
+    private final UserSocialsRepository userSocialsRepo;
 
     private final CommentRepository commentRepo;
 
@@ -141,6 +144,7 @@ public class UserService {
         user.setBooks(bookRepo.findAllUserBooks(user.getId()));
         user.setFavorites(bookRepo.findAllUserFavoriteBooks(user.getId()));
         user.setOrders(bookRepo.findAllUserOrderedBooks(user.getId()));
+        user.setSocials(userSocialsRepo.findByEmail(email));
         return user;
     }
 
@@ -201,6 +205,7 @@ public class UserService {
     public UserDetails updateUserDetails(Long id, String token, UserUpdate detailsUpdate) {
         var user = serviceUtils.validateThatSameUserCredentials(id, token);
         mapper.mapUserUpdateToAppUser(detailsUpdate, user);
+        userSocialsRepo.save(user.getEmail(), detailsUpdate.getSocials());
         userRepo.save(user);
         return findUserDetailsByJwt(token);
     }

@@ -36,6 +36,8 @@ public class UserDetails {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
 
+    private List<String> socials;
+
     private Set<UserBookOrders> orders = new HashSet<>();
 
     private Set<UserBook> favorites = new HashSet<>();
@@ -44,7 +46,12 @@ public class UserDetails {
 
     private List<UserBook> books = new ArrayList<>();
 
-    public UserDetails(Long id, Boolean isVerified, String fullName, String email, String phone, LocalDate dateOfBirth) {
+    public UserDetails(Long id,
+                       Boolean isVerified,
+                       String fullName,
+                       String email,
+                       String phone,
+                       LocalDate dateOfBirth) {
         this.id = id;
         this.isVerified = isVerified;
         this.fullName = fullName;
@@ -52,5 +59,4 @@ public class UserDetails {
         this.phone = phone;
         this.dateOfBirth = dateOfBirth;
     }
-
 }
