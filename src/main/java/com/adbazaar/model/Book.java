@@ -85,7 +85,7 @@ public class Book {
     @ManyToMany(mappedBy = "orders")
     private Set<AppUser> buyers = new HashSet<>();
 
-    public static Book build(NewBook details, AppUser user) {
+    public static Book build(NewBook details, String imageUrl, AppUser user) {
         return Book.builder()
                 .title(details.getTitle())
                 .author(details.getAuthor())
@@ -97,7 +97,7 @@ public class Book {
                 .language(details.getLanguage())
                 .publishHouse(details.getPublishHouse())
                 .seller(user)
-                .imagePath(details.getImagePath())
+                .imagePath(imageUrl)
                 .build();
     }
 

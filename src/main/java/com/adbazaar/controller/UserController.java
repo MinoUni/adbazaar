@@ -147,11 +147,12 @@ public class UserController {
                             content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))})
             }
     )
-    @PostMapping("/{id}/books")
+    @PostMapping(path = "/{id}/books", consumes = {APPLICATION_JSON_VALUE, MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ApiResp> addBook(@RequestHeader(AUTHORIZATION) String token,
                                            @PathVariable("id") Long userId,
-                                           @Valid @RequestBody NewBook newBook) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.create(userId, token, newBook));
+                                           @Valid @RequestPart("newBook") NewBook newBook,
+                                           @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.create(userId, token, file, newBook));
     }
 
     @Operation(
@@ -192,12 +193,13 @@ public class UserController {
                             content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))})
             }
     )
-    @PatchMapping("/{userId}/books/{bookId}")
+    @PatchMapping(path = "/{userId}/books/{bookId}", consumes = {APPLICATION_JSON_VALUE, MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ApiResp> updateById(@PathVariable("userId") Long userId,
                                               @PathVariable("bookId") Long bookId,
                                               @RequestHeader(AUTHORIZATION) String token,
-                                              @Valid @RequestBody BookUpdate details) {
-        return ResponseEntity.ok(bookService.updateById(userId, bookId, details, token));
+                                              @Valid @RequestPart("book_update_json") BookUpdate bookUpdate,
+                                              @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok(bookService.updateById(userId, bookId, token, bookUpdate, file));
     }
 
     @Operation(
