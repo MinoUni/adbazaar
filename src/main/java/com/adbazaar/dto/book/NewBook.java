@@ -27,9 +27,6 @@ public class NewBook {
     @NotBlank(message = "Field {format} must not be blank")
     private String format;
 
-    @JsonProperty("image_path")
-    private String imagePath;
-
     @Positive
     @NotNull(message = "Field {price} can't be null")
     private BigDecimal price;

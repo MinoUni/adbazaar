@@ -20,9 +20,6 @@ public class BookUpdate {
 
     private String format;
 
-    @JsonProperty("image_path")
-    private String imagePath;
-
     private BigDecimal price;
 
     private Integer quantity;

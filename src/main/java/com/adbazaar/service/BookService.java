@@ -7,6 +7,7 @@ import com.adbazaar.dto.book.BookUpdate;
 import com.adbazaar.dto.book.NewBook;
 import com.adbazaar.exception.BookException;
 import com.adbazaar.exception.BookNotFoundException;
+import com.adbazaar.exception.CloudinaryUploadException;
 import com.adbazaar.model.Book;
 import com.adbazaar.repository.BookRepository;
 import com.adbazaar.utils.CustomMapper;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.adbazaar.utils.MessageUtils.BOOK_ALREADY_EXISTS;
 import static com.adbazaar.utils.MessageUtils.BOOK_CREATED;
@@ -33,13 +35,20 @@ public class BookService {
 
     private final ServiceUtils serviceUtils;
 
-    public ApiResp create(Long userId, String token, NewBook newBook) {
+    private final CloudinaryService cloudinaryService;
+
+    public ApiResp create(Long userId, String token, MultipartFile file, NewBook newBook) {
+        if (file == null) {
+            throw new CloudinaryUploadException("No file to upload");
+        }
         var user = serviceUtils.validateThatSameUserCredentials(userId, token);
-        if(bookRepo.existsByParams(newBook.getTitle(), newBook.getAuthor(), newBook.getFormat(),
+        if (bookRepo.existsByParams(newBook.getTitle(), newBook.getAuthor(), newBook.getFormat(),
                 newBook.getGenre(), newBook.getLanguage(), newBook.getPublishHouse())) {
             throw new BookException(BOOK_ALREADY_EXISTS);
         }
-        var book = Book.build(newBook, user);
+        String imageUrl = cloudinaryService.uploadBookImage(file, String.format("%s_%s_%s_%s", newBook.getTitle(), newBook.getFormat(),
+                newBook.getPublishHouse(), newBook.getLanguage()));
+        var book = Book.build(newBook, imageUrl, user);
         bookRepo.save(book);
         return ApiResp.build(HttpStatus.CREATED, String.format(BOOK_CREATED, userId));
     }
@@ -60,12 +69,18 @@ public class BookService {
         return ApiResp.build(HttpStatus.OK, String.format(BOOK_DELETED, userId, bookId));
     }
 
-    public ApiResp updateById(Long userId, Long bookId, BookUpdate details, String token) {
+    public ApiResp updateById(Long userId, Long bookId, String token, BookUpdate details, MultipartFile file) {
+        if (file == null) {
+            throw new CloudinaryUploadException("No file to upload");
+        }
         var user = serviceUtils.validateThatSameUserCredentials(userId, token);
         var book = serviceUtils.findBookById(bookId);
         if (!user.getBooks().contains(book)) {
             throw new BookNotFoundException(String.format(BOOK_NOT_FOUND_IN_USER_BOOKS_LIST, userId, bookId));
         }
+        String imageUrl = cloudinaryService.uploadBookImage(file, String.format("%s_%s_%s_%s", details.getTitle(), details.getFormat(),
+                details.getPublishHouse(), details.getLanguage()));
+        book.setImagePath(imageUrl);
         mapper.updateBook(details, book);
         bookRepo.save(book);
         return ApiResp.build(HttpStatus.OK, String.format(BOOK_UPDATED, userId, bookId));

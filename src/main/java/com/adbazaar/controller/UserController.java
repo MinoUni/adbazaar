@@ -14,6 +14,7 @@ import com.adbazaar.service.BookService;
 import com.adbazaar.service.CommentService;
 import com.adbazaar.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -147,11 +148,12 @@ public class UserController {
                             content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))})
             }
     )
-    @PostMapping("/{id}/books")
+    @PostMapping(path = "/{id}/books", consumes = {MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ApiResp> addBook(@RequestHeader(AUTHORIZATION) String token,
                                            @PathVariable("id") Long userId,
-                                           @Valid @RequestBody NewBook newBook) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.create(userId, token, newBook));
+                                           @RequestPart("book") @Parameter(schema = @Schema(type = "string", format = "binary")) NewBook book,
+                                           @RequestPart("image") MultipartFile file) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.create(userId, token, file, book));
     }
 
     @Operation(
@@ -192,12 +194,13 @@ public class UserController {
                             content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class))})
             }
     )
-    @PatchMapping("/{userId}/books/{bookId}")
+    @PatchMapping(path = "/{userId}/books/{bookId}", consumes = {APPLICATION_JSON_VALUE, MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ApiResp> updateById(@PathVariable("userId") Long userId,
                                               @PathVariable("bookId") Long bookId,
                                               @RequestHeader(AUTHORIZATION) String token,
-                                              @Valid @RequestBody BookUpdate details) {
-        return ResponseEntity.ok(bookService.updateById(userId, bookId, details, token));
+                                              @Valid @RequestPart("book_update_json") BookUpdate bookUpdate,
+                                              @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok(bookService.updateById(userId, bookId, token, bookUpdate, file));
     }
 
     @Operation(
