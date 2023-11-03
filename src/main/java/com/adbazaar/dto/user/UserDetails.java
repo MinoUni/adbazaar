@@ -30,6 +30,9 @@ public class UserDetails {
 
     private String email;
 
+    @JsonProperty("image_url")
+    private String imageUrl;
+
     private String phone;
 
     @JsonProperty("birt_date")
@@ -51,12 +54,14 @@ public class UserDetails {
                        String fullName,
                        String email,
                        String phone,
+                       String imageUrl,
                        LocalDate dateOfBirth) {
         this.id = id;
         this.isVerified = isVerified;
         this.fullName = fullName;
         this.email = email;
         this.phone = phone;
+        this.imageUrl = imageUrl;
         this.dateOfBirth = dateOfBirth;
     }
 }

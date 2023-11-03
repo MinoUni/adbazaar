@@ -31,10 +31,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RequiredArgsConstructor
 @Tag(name = "Users", description = "Users management endpoints")
@@ -94,6 +97,14 @@ public class UserController {
                                                          @RequestBody UserUpdate detailsUpdate) {
         return ResponseEntity.ok(userService.updateUserDetails(id, token, detailsUpdate));
     }
+
+    @PatchMapping(path = "{id}/avatar", consumes = {MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<UserDetails> updateUserAvatar(@RequestHeader(AUTHORIZATION) String token,
+                                                        @PathVariable("id") Long id,
+                                                        @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(userService.updateUserAvatarImage(id, token, file));
+    }
+
 
     @Operation(
             summary = "Change user password",

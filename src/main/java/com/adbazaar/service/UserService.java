@@ -14,6 +14,7 @@ import com.adbazaar.dto.user.UserUpdate;
 import com.adbazaar.exception.AccountVerificationException;
 import com.adbazaar.exception.BookException;
 import com.adbazaar.exception.BookNotFoundException;
+import com.adbazaar.exception.CloudinaryUploadException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
 import com.adbazaar.model.AppUser;
@@ -34,6 +35,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -55,6 +57,7 @@ import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_CODE_EXPIRED;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_INVALID_CODE;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_REASSIGNED;
 import static com.adbazaar.utils.MessageUtils.USER_VERIFICATION_SUCCESSFUL;
+import static com.adbazaar.utils.MessageUtils.VERIFICATION_MAIL_SUBJECT;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -72,6 +75,8 @@ public class UserService {
     private final CommentRepository commentRepo;
 
     private final JwtService jwtService;
+
+    private final CloudinaryService cloudinaryService;
 
     private final AuthenticationManager authenticationManager;
 
@@ -210,6 +215,18 @@ public class UserService {
         return findUserDetailsByJwt(token);
     }
 
+    public UserDetails updateUserAvatarImage(Long id, String token, MultipartFile file) {
+        if (file == null) {
+            log.error("Failed to upload a file for user: {}", id);
+            throw new CloudinaryUploadException("No file to upload");
+        }
+        var user = serviceUtils.validateThatSameUserCredentials(id, token);
+        var imageUrl = cloudinaryService.uploadUserImage(file, id);
+        user.setImageUrl(imageUrl);
+        userRepo.save(user);
+        return findUserDetailsByJwt(token);
+    }
+
     public ApiResp changeUserPassword(Long id, String token, ChangePassCredentials request) {
         var user = serviceUtils.validateThatSameUserCredentials(id, token);
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), request.getCurPassword()));
@@ -222,5 +239,4 @@ public class UserService {
         return userRepo.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_EMAIL, email)));
     }
-
 }

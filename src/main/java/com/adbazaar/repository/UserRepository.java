@@ -17,7 +17,7 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
     boolean existsByEmail(String email);
 
     @Query("""
-            SELECT new com.adbazaar.dto.user.UserDetails(u.id, u.isVerified, u.fullName, u.email, u.phone, u.dateOfBirth)
+            SELECT new com.adbazaar.dto.user.UserDetails(u.id, u.isVerified, u.fullName, u.email, u.phone, u.imageUrl, u.dateOfBirth)
             FROM AppUser u
             WHERE u.email = :email""")
     Optional<UserDetails> findUserDetailsByEmail(@Param("email") String email);
