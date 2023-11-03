@@ -40,16 +40,16 @@ import static com.adbazaar.utils.MessageUtils.USER_NOT_FOUND_BY_EMAIL;
 @Service
 public class JwtService {
 
-    @Value("${application.security.jwt.access.secret-key}")
+    @Value("${jwt.access.secret-key}")
     private String accessSecretKey;
 
-    @Value("${application.security.jwt.access.expiration-minutes}")
+    @Value("${jwt.access.expiration-minutes}")
     private Integer accessExpirationMinutes;
 
-    @Value("${application.security.jwt.refresh.secret-key}")
+    @Value("${jwt.refresh.secret-key}")
     private String refreshSecretKey;
 
-    @Value("${application.security.jwt.refresh.expiration-days}")
+    @Value("${jwt.refresh.expiration-days}")
     private Integer refreshExpirationDays;
 
     private final UserJwtTokenRepository tokenRepo;

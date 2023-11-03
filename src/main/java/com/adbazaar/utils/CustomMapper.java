@@ -19,6 +19,8 @@ public interface CustomMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
     @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "rate", ignore = true)
+    @Mapping(target = "imagePath", ignore = true)
     @Mapping(target = "favorites", ignore = true)
     @Mapping(target = "buyers", ignore = true)
     void updateBook(BookUpdate updateDetails, @MappingTarget Book book);
@@ -29,6 +31,7 @@ public interface CustomMapper {
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "imageUrl", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
+    @Mapping(target = "authorities", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "isVerified", ignore = true)
     @Mapping(target = "books", ignore = true)
