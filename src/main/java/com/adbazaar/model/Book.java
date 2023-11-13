@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -37,7 +38,6 @@ public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, updatable = false)
     private Long id;
 
     private String title;
@@ -52,9 +52,9 @@ public class Book {
 
     private String format;
 
-    @Column(precision = 8, scale = 2)
     @Builder.Default
-    private BigDecimal rate = BigDecimal.valueOf(0);
+    @Column(columnDefinition = "Decimal(5, 2)")
+    private Double rate = 0.0;
 
     @Builder.Default
     private Integer quantity = 0;
@@ -85,7 +85,7 @@ public class Book {
     @ManyToMany(mappedBy = "orders")
     private Set<AppUser> buyers = new HashSet<>();
 
-    public static Book build(NewBook details, AppUser user) {
+    public static Book build(NewBook details, String imageUrl, AppUser user) {
         return Book.builder()
                 .title(details.getTitle())
                 .author(details.getAuthor())
@@ -97,23 +97,23 @@ public class Book {
                 .language(details.getLanguage())
                 .publishHouse(details.getPublishHouse())
                 .seller(user)
-                .imagePath(details.getImagePath())
+                .imagePath(imageUrl)
                 .build();
     }
 
     @Override
-    public boolean equals(Object object) {
+    public final boolean equals(Object object) {
         if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
+        if (object == null) return false;
+        Class<?> oEffectiveClass = object instanceof HibernateProxy ? ((HibernateProxy) object).getHibernateLazyInitializer().getPersistentClass() : object.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
         Book book = (Book) object;
-        return Objects.equals(id, book.id) && Objects.equals(title, book.title) &&
-                Objects.equals(author, book.author) && Objects.equals(format, book.format) &&
-                Objects.equals(genre, book.genre) && Objects.equals(language, book.language) &&
-                Objects.equals(publishHouse, book.publishHouse);
+        return getId() != null && Objects.equals(getId(), book.getId());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id, title, author, format, genre, language, publishHouse);
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

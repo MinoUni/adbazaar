@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserBook {
+public class UserBookOrders {
 
     private Long id;
 
@@ -24,4 +24,6 @@ public class UserBook {
     private Double rate;
 
     private BigDecimal price;
+
+    private Integer quantity;
 }

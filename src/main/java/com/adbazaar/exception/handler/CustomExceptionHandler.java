@@ -9,6 +9,7 @@ import com.adbazaar.exception.RefreshTokenException;
 import com.adbazaar.exception.UserAlreadyExistException;
 import com.adbazaar.exception.UserNotFoundException;
 import com.adbazaar.exception.UserNotMatchWithJwtException;
+import com.adbazaar.exception.UserPasswordException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -50,7 +51,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(MailSendException.class)
     public ResponseEntity<Object> handleMailSendException(MailSendException e) {
-        return buildExceptionResponse(e, HttpStatus.BAD_REQUEST, List.of());
+        return buildExceptionResponse(e, HttpStatus.BAD_REQUEST, List.of("Mail send error"));
     }
 
     @ExceptionHandler(JwtTokenException.class)
@@ -78,11 +79,16 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildExceptionResponse(e, HttpStatus.UNAUTHORIZED, List.of());
     }
 
+    @ExceptionHandler(UserPasswordException.class)
+    public ResponseEntity<Object> handleUserPasswordException(UserPasswordException e) {
+        return buildExceptionResponse(e, HttpStatus.UNAUTHORIZED, List.of());
+    }
+/*
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleOtherExceptions(Exception e) {
         return buildExceptionResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, List.of());
     }
-
+*/
     @ExceptionHandler(UserNotMatchWithJwtException.class)
     public ResponseEntity<Object> handleUserNotMatchWithJwtException(UserNotMatchWithJwtException e) {
         return buildExceptionResponse(e, HttpStatus.UNAUTHORIZED, List.of());

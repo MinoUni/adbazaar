@@ -1,21 +1,10 @@
-# LOGGING
-logging:
-  level:
-    root: INFO
-# SPRING
 spring:
-#  SECURITY
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
-            scope:
-              - email
-              - profile
-  # MAIL SENDER
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+  profiles:
+    active: dev_qa
   mail:
     host: smtp.gmail.com
     port: 587
@@ -43,18 +32,29 @@ spring:
         format-sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
+    driverClassName: org.postgresql.Driver
     url: jdbc:${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    driverClassName: org.postgresql.Driver
-# APPLICATION
-application:
-  # JWT
-  security:
-    jwt:
-      access:
-        secret-key: ${JWT_ACCESS_SECRET}
-        expiration-minutes: 30
-      refresh:
-        secret-key: ${JWT_REFRESH_SECRET}
-        expiration-days: 7
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id: ${GOOGLE_CLIENT_ID}
+#            client-secret: ${GOOGLE_CLIENT_SECRET}
+#            redirect-uri:
+#            scope:
+#              - email
+#              - profile
+jwt:
+  access:
+    secret-key: ${JWT_ACCESS_SECRET}
+    expiration-minutes: 30
+  refresh:
+    secret-key: ${JWT_REFRESH_SECRET}
+    expiration-days: 7
+cloudinary:
+  cloud-name: ${CLOUDINARY_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
