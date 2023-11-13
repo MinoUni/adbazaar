@@ -4,7 +4,7 @@ spring:
       max-file-size: 5MB
       max-request-size: 5MB
   profiles:
-    active: dev_qa
+    active:
   mail:
     host: smtp.gmail.com
     port: 587

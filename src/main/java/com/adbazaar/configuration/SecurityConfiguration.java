@@ -2,7 +2,6 @@ package com.adbazaar.configuration;
 
 import com.adbazaar.security.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -49,7 +48,7 @@ public class SecurityConfiguration {
                                 mvc.pattern("/configuration/security"),
                                 mvc.pattern("/swagger-ui/**"),
                                 mvc.pattern("/webjars/**"),
-                                mvc.pattern("/swagger-ui.html"), PathRequest.toH2Console())
+                                mvc.pattern("/swagger-ui.html"))
                         .permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
@@ -60,7 +59,7 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cors = new CorsConfiguration();
-        cors.setAllowedOrigins(List.of("http://localhost:3000"));
+        cors.setAllowedOrigins(List.of("https://adbazaar-frontend-nu.vercel.app"));
         cors.setAllowedMethods(List.of("GET", "POST", "DELETE", "PATCH", "PUT", "OPTIONS"));
         cors.setAllowedHeaders(List.of("X-Requested-With", "Origin", "Content-Type", "Accept", "Authorization"));
         cors.setExposedHeaders(List.of("Content-Type", "Cache-Control", "Content-Language", "Content-Length", "Last-Modified"));
